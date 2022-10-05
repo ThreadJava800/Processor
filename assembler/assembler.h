@@ -6,10 +6,10 @@
 #include <stdlib.h>
 
 #include "../mlibs/onegin/onegin.h"
-#include "../mlibs/stack/stack.h"
+#include "../config.h"
 
 const int VERSION = 1;
-const int SIGNATURE = 67 * 256 + 74;  // CJ
+const int SIGNATURE = 74 * 256 + 67;  // CJ
 
 enum AsmErrorCodes {
     OK                      =  0,
@@ -19,25 +19,7 @@ enum AsmErrorCodes {
     NULL_PTR                = -4,
 };
 
-enum LanguageDict {
-    PUSH = 0,
-    ADD  = 1,
-    DIV  = 2,
-    OUT  = 3,
-    IN   = 4,
-    HLT  = 5,   
-};
-
 const int MAX_COMMAND_LENGTH = 10;
-
-static const char *language[] = {
-    "PUSH",
-    "ADD",
-    "DIV",
-    "OUT",
-    "IN",
-    "HLT",
-};
 
 static const char *baseOutputName = "output.txt";
 
