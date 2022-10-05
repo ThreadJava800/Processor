@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name
-project(Processor)
+project(Disasm)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations \
 -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported -Wconversion -Wctor-dtor-privacy -Wempty-body \
@@ -15,4 +15,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -W
 -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr")
 
 # add the executable
-add_executable(Processor assembler.h assembler.cpp)
+add_executable(Disasm disassembler.h disassembler.cpp main.cpp)

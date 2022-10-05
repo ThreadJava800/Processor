@@ -87,6 +87,7 @@ int translateCommand(Strings *commands, const char *outputName){
     fwrite(machineCommands, sizeof(machineCommands[0]), commandCount, output);
 
     fclose(output);
+    free(machineCommands);
 
     return OK;
 }

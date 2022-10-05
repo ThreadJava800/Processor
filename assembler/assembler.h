@@ -1,5 +1,5 @@
-#ifndef SECURED_STACK_H
-#define SECURED_STACK_H
+#ifndef ASM_H
+#define ASM_H
 
 #include <stdio.h>
 #include <string.h>
