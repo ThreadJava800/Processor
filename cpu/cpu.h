@@ -12,7 +12,7 @@ const int REGSIZE = 4;
 const int RAMSIZE = 100;
 
 struct Cpu_t {
-    int *commands = nullptr;
+    char *commands = nullptr;
     Stack_t stack = {};
     int *ram = nullptr;
     int *reg = nullptr;

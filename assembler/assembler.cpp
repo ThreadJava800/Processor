@@ -140,7 +140,7 @@ int parseLine(char *buf, int *count, int *commandId, int *arg1, int *arg2) {
     //     }
     // }
 
-    val = sscanf(buf, "%s %d", command, arg1);
+    int val = sscanf(buf, "%s %d", command, arg1);
     if (val == 2) {
         *commandId = iMask + (*commandId);
         *count = 1;

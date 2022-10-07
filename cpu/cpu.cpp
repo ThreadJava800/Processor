@@ -61,7 +61,7 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
 
     fread(&count, sizeof(int), 1, file);
 
-    int *commands = (int *) calloc(count + 1, sizeof(int));
+    char *commands = (char *) calloc(count + 1, sizeof(int));
     if (!commands) {
         errorCode = NO_MEMORY;
     }
@@ -79,7 +79,8 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
 
 
     for (int ip = 0; ip < count; ip++) {
-        switch(commands[ip]) {
+        int com = commands[ip] & 0xF, args = commands[ip] >> 4;
+        switch(com) {
             case PUSH:
                 errorCode = push(&cpu->stack, commands[++ip]);
                 break;

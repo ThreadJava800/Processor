@@ -1,3 +1,6 @@
+PUSH 4
+PUSH 3
+PUSH 5
 PUSH rax 5
 OUT
 DUMP
