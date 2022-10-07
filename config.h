@@ -7,6 +7,7 @@ enum LanguageDict {
     IN   = 5,
     MUL  = 6,
     SUB  = 7,
+    DUMP = 8,
 };
 
 static const char *language[] = {
@@ -18,4 +19,5 @@ static const char *language[] = {
     "IN",
     "MUL",
     "SUB",
+    "DUMP",
 };

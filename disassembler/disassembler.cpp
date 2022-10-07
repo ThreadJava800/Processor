@@ -64,6 +64,9 @@ int translateCommand(FILE *input, FILE *output) {
             case HLT:
                 fprintf(output, "HLT\n");
                 break;
+            case HLT:
+                fprintf(output, "DUMP\n");
+                break;
             default:
                 errorCode = UNKNOWN_COMMAND;
                 break;

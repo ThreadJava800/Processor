@@ -1,5 +1,14 @@
 #include "cpu.h"
 
+int checkCpu(Cpu_t *cpu) {
+    if (!cpu) return CPU_NULL;
+    if (!cpu->commands) COMMANDS_NULL;
+    if (!cpu->ram) RAM_NULL;
+    if (!cpu->reg) REG_NULL;
+
+    return NO_ERROR;
+}
+
 int verifyFile(FILE *file) {
     int errorCode = NO_ERROR;
 
@@ -21,7 +30,7 @@ int verifyFile(FILE *file) {
     return errorCode;
 }
 
-int init(char *fileName) {
+int execute(char *fileName) {
     int errorCode = NO_ERROR;
 
     if (!fileName) {
@@ -39,12 +48,15 @@ int init(char *fileName) {
         return errorCode;
     }
 
-    parseCommands(instructions);
+    Cpu_t cpu = { };
+    parseCommands(instructions, &cpu);
+
+    freeCpu(&cpu);
 
     return errorCode;
 }
 
-int parseCommands(FILE *file) {
+int parseCommands(FILE *file, Cpu_t *cpu) {
     int count = 0, errorCode = NO_ERROR;
 
     fread(&count, sizeof(int), 1, file);
@@ -57,32 +69,43 @@ int parseCommands(FILE *file) {
 
     Stack_t stack = {};
     stackCtor(&stack, 1);
+    int reg[REGSIZE] = {}; 
+    int ram[RAMSIZE] = {};
+
+    cpu->commands = commands;
+    cpu->reg = reg;
+    cpu->ram = ram;
+    cpu->stack = stack;
+
 
     for (int ip = 0; ip < count; ip++) {
         switch(commands[ip]) {
             case PUSH:
-                push(&stack, commands[++ip]);
+                errorCode = push(&cpu->stack, commands[++ip]);
                 break;
             case ADD:
-                add(&stack);
+                errorCode = add(&cpu->stack);
                 break;
             case DIV:
-                div(&stack);
+                errorCode = div(&cpu->stack);
                 break;
             case OUT:
-                out(&stack);
+                errorCode = out(&cpu->stack);
                 break;
             case IN:
-                in(&stack);
+                errorCode = in(&cpu->stack);
                 break;
             case SUB:
-                sub(&stack);
+                errorCode = sub(&cpu->stack);
                 break;
             case MUL:
-                mul(&stack);
+                errorCode = mul(&cpu->stack);
                 break;
             case HLT:
                 hlt();
+                break;
+            case DUMP:
+                DUMP_CPU(cpu, errorCode);
                 break;
             default:
                 errorCode = UNKNOWN_COMMAND;
@@ -94,6 +117,16 @@ int parseCommands(FILE *file) {
     stackDtor(&stack, &errorCode);
 
     return errorCode;
+}
+
+int freeCpu(Cpu_t *cpu) {
+    if (!cpu) return CPU_NULL;
+    if (cpu->commands) free(cpu->commands);
+    if (cpu->reg) free(cpu->reg);
+    if (cpu->ram) free(cpu->ram);
+    stackDtor(&cpu->stack);
+
+    return NO_ERROR;
 }
 
 int push(Stack_t *stack, int value) {
@@ -158,6 +191,14 @@ int sub(Stack_t *stack) {
     stackPush(stack, sub, &errorCode);
 
     return errorCode;
+}
+
+void dump(Cpu_t *cpu, int errorCode, const char *file, const char *function, int line) {
+    if (cpu) {
+        dumpStack(&cpu->stack, stderr, errorCode, printElemT, function, file, line);
+    } else {
+        mprintf(stderr, "%s", "CPU[0x00000000] - NULLPTR");
+    }
 }
 
 void hlt() {
