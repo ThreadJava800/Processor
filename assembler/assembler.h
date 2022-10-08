@@ -11,10 +11,6 @@
 const int VERSION = 1;
 const int SIGNATURE = 74 * 256 + 67;  // CJ
 
-const char iMask = 0x10;
-const char rMask = 0x20;
-const char mMask = 0x40;
-
 enum AsmErrorCodes {
     OK                      =  0,
     INCORRECT_FILE_NAME     = -1,

@@ -1,7 +1,13 @@
+PUSH 0
 PUSH 4
 PUSH 3
 PUSH 5
-PUSH rax 5
+POP [1]
+POP rcx
+POP [rcx]
+PUSH rax
+PUSH [1]
+PUSH [rcx]
 OUT
 DUMP
 HLT

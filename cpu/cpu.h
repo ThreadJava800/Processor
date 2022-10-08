@@ -28,7 +28,7 @@ enum CpuErrorCodes {
     NO_MEMORY               = -6,
     UNKNOWN_COMMAND         = -7,
     CPU_NULL                = -8,
-    STCK_NULL              = -9,
+    STCK_NULL               = -9,
     RAM_NULL                = -10,
     REG_NULL                = -11,
     COMMANDS_NULL           = -12,
@@ -44,7 +44,7 @@ int parseCommands(FILE *file, Cpu_t *cpu);
 
 int freeCpu(Cpu_t *cpu);
 
-int push(Stack_t *stack, int value);
+int push(Cpu_t *cpu, int value, int mode);
 
 int add(Stack_t *stack);
 
@@ -57,6 +57,8 @@ int in(Stack_t *stack);
 int mul(Stack_t *stack);
 
 int sub(Stack_t *stack);
+
+int pop(Cpu_t *cpu, int mode, int arg = -1);
 
 void dump(Cpu_t *cpu, int errorCode, const char *file, const char *function, int line);
 

@@ -61,7 +61,7 @@ int translateCommand(Strings *commands, const char *outputName){
             sscanf(commands->array[i], "%s %n", command, &commandLength);
 
             if (!strcasecmp(command, language[j])) {
-                if (j == PUSH) {
+                if (j == PUSH || j == POP) {
                     int count = 0, commandId = j, arg1 = 0, arg2 = 0;
                     parseLine(commands->array[i], &count, &commandId, &arg1, &arg2);
 
