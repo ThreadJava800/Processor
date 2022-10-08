@@ -9,6 +9,7 @@ enum LanguageDict {
     SUB  = 7,
     DUMP = 8,
     POP  = 9,
+    JMP  = 10,
 };
 
 static const char *language[] = {
@@ -22,6 +23,7 @@ static const char *language[] = {
     "SUB",
     "DUMP",
     "POP",
+    "JMP",
 };
 
 const char iMask = 0x10;

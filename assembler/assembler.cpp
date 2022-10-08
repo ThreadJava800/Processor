@@ -74,6 +74,21 @@ int translateCommand(Strings *commands, const char *outputName){
                     machineCommandsSize += sizeof(int);
 
                     commandCount += 2;
+                } else if (j == JMP) {
+                    int commandIp = 0;
+                    int num = sscanf(commands->array[i], "%s %d", command, &commandIp);
+
+                    if (num == 2) {
+                        *machineCommands = j;
+                        machineCommands++;
+                        machineCommandsSize++;
+
+                        *machineCommands = commandIp;
+                        machineCommands += sizeof(int);
+                        machineCommandsSize += sizeof(int);
+
+                        commandCount += 2;
+                    }
                 } else {
                     *machineCommands = j;
                     machineCommands++;
