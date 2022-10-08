@@ -8,7 +8,8 @@ POP [rcx]
 PUSH rax
 PUSH [1]
 PUSH [rcx]
-JMP 4
+JMP 1
+1:
 OUT
 DUMP
 HLT

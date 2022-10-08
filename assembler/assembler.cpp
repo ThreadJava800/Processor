@@ -35,7 +35,7 @@ int parseAsm(const char *fileName, const char *outputName) {
     return error;
 }
 
-int translateCommand(Strings *commands, const char *outputName){ 
+int translateCommand(Strings *commands, const char *outputName, int *labels){ 
     if (!commands) {
         return COMMANDS_NULL;
     }
@@ -49,7 +49,8 @@ int translateCommand(Strings *commands, const char *outputName){
     }
 
     char *machineCommands = (char *) calloc(2 * commands->size, sizeof(int));
-    int commandCount = 0, machineCommandsSize = 0;
+    if (!labels) labels = (int *) calloc(commands->size, sizeof(int));
+    int commandCount = 0, machineCommandsSize = 0, needSecondCompile = 0;
 
     for (int i = 0; i < commands->size; i++) {
         int languageLen = sizeof(language) / sizeof(language[0]);
@@ -83,9 +84,19 @@ int translateCommand(Strings *commands, const char *outputName){
                         machineCommands++;
                         machineCommandsSize++;
 
-                        *machineCommands = commandIp;
-                        machineCommands += sizeof(int);
-                        machineCommandsSize += sizeof(int);
+                        if (labels + commandIp) {
+                            if (labels[commandIp] != 0) {
+                                *machineCommands = labels[commandIp];
+                                machineCommands += sizeof(int);
+                                machineCommandsSize += sizeof(int);
+                            } else {
+                                *machineCommands = -1;
+                                machineCommands += sizeof(int);
+                                machineCommandsSize += sizeof(int);
+
+                                needSecondCompile = 1;
+                            }
+                        }
 
                         commandCount += 2;
                     }
@@ -95,6 +106,13 @@ int translateCommand(Strings *commands, const char *outputName){
                     machineCommandsSize++;
 
                     commandCount++;
+                }
+            }
+            else { // if (strcasecmp(command, language[j]))
+                int label = 0;
+                int successfuleInputs = sscanf(commands->array[i], "%d:", &label);
+                if (successfuleInputs == 1) {
+                    labels[label] = machineCommandsSize + 1;
                 }
             }
         }

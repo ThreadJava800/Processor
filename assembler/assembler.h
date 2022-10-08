@@ -28,7 +28,7 @@ int checkCommands(Strings *commands);
 
 int parseAsm(const char *fileName, const char *outputName = baseOutputName);
 
-int translateCommand(Strings *commands, const char *outputName);
+int translateCommand(Strings *commands, const char *outputName, int *labels = nullptr);
 
 int parseLine(char *buf, int *count, int *commandId, int *arg1, int *arg2);
 
