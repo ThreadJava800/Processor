@@ -16,7 +16,7 @@ int checkCommands(Strings *commands) {
     return OK;
 }
 
-int parseAsm(const char *fileName, const char *outputName) {
+int execute(const char *fileName, const char *outputName) {
     int error = OK;
 
     if (!fileName) {
@@ -38,7 +38,7 @@ int parseAsm(const char *fileName, const char *outputName) {
         .humanCommands = commands,
     };
 
-    error = translateCommand(&assembler);
+    error = compile(&assembler);
 
     generateMachineFile(&assembler, outputName);
 
@@ -47,7 +47,7 @@ int parseAsm(const char *fileName, const char *outputName) {
     return error;
 }
 
-int translateCommand(Assembler_t *assembler, int *labels){ 
+int compile(Assembler_t *assembler, int *labels){ 
     if (!assembler) return NULL_PTR;
     if (!assembler->machineCommands || !assembler->humanCommands.array) return NULL_PTR;
 
@@ -66,7 +66,14 @@ int translateCommand(Assembler_t *assembler, int *labels){
                 if (j == PUSH || j == POP) {
                     int count = 0, arg1 = 0, arg2 = 0;
                     char commandId = j;
-                    parseLine(assembler->humanCommands.array[i], &count, &commandId, &arg1, &arg2);
+
+                    parsePush(assembler->humanCommands.array[i], &count, &commandId, &arg1, &arg2);
+                    if (j == POP)  {
+                        if ((commandId & iMask) && !(commandId & mMask)) {
+                            fprintf(stderr, "%d %d\n", commandId, j);
+                            return INCORRECT_FORMAT;
+                        }
+                    }
 
                     *assembler->machineCommands = commandId;
                     assembler->machineCommands++;
@@ -76,13 +83,15 @@ int translateCommand(Assembler_t *assembler, int *labels){
                     assembler->machineCommands += sizeof(int);
                     assembler->commandBytes += sizeof(int);
 
+                    assembler->commandCount += 2;
+
                     if (count == 2) {
                         memcpy(assembler->machineCommands, &arg2, sizeof(int));
                         assembler->machineCommands += sizeof(int);
                         assembler->commandBytes += sizeof(int);
+                        assembler->commandCount++;
                     }
 
-                    assembler->commandCount += 2;
                 } else if (j == JMP) {
                     int commandIp = 0;
                     int valueAmount = sscanf(assembler->humanCommands.array[i], "%s %d", command, &commandIp);
@@ -131,7 +140,8 @@ int translateCommand(Assembler_t *assembler, int *labels){
 
     if (needSecondCompile) {
         assembler->commandBytes = 0;
-        translateCommand(assembler, labels);
+        assembler->commandCount = 0;
+        compile(assembler, labels);
     }
 
     return OK;
@@ -155,7 +165,7 @@ int generateMachineFile(Assembler_t *assembler, const char *fileName) {
     return OK;
 }
 
-int parseLine(char *buf, int *count, char *commandId, int *arg1, int *arg2) {
+int parsePush(char *buf, int *count, char *commandId, int *arg1, int *arg2) {
     if (!buf || !count || !commandId || !arg1 || !arg2) return NULL_PTR;
 
     *count = 0;

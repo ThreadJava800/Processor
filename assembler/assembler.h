@@ -33,15 +33,17 @@ static const char *baseOutputName = "output.txt";
 
 int checkCommands(Strings *commands);
 
-int parseAsm(const char *fileName, const char *outputName = baseOutputName);
+int execute(const char *fileName, const char *outputName = baseOutputName);
 
-int translateCommand(Assembler_t *assembler, int *labels = nullptr);
+int compile(Assembler_t *assembler, int *labels = nullptr);
 
 int generateMachineFile(Assembler_t *assembler, const char *fileName);
 
 int hasBrackets(char *command);
 
-int parseLine(char *buf, int *count, char *commandId, int *arg1, int *arg2);
+int parsePush(char *buf, int *count, char *commandId, int *arg1, int *arg2);
+
+int parsePop(char *buf, int *count, char *commandId, int *arg1, int *arg2);
 
 int freeAssembler(Assembler_t *assembler);
 
