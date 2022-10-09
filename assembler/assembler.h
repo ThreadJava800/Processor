@@ -20,6 +20,13 @@ enum AsmErrorCodes {
     INCORRECT_FORMAT        = -5,
 };
 
+struct Assembler_t {
+    int commandBytes = 0;
+    int commandCount = 0;
+    char *machineCommands = nullptr;
+    Strings humanCommands = {};
+};
+
 const int MAX_COMMAND_LENGTH = 10;
 
 static const char *baseOutputName = "output.txt";
@@ -28,8 +35,14 @@ int checkCommands(Strings *commands);
 
 int parseAsm(const char *fileName, const char *outputName = baseOutputName);
 
-int translateCommand(Strings *commands, const char *outputName, int *labels = nullptr);
+int translateCommand(Assembler_t *assembler, int *labels = nullptr);
 
-int parseLine(char *buf, int *count, int *commandId, int *arg1, int *arg2);
+int generateMachineFile(Assembler_t *assembler, const char *fileName);
+
+int hasBrackets(char *command);
+
+int parseLine(char *buf, int *count, char *commandId, int *arg1, int *arg2);
+
+int freeAssembler(Assembler_t *assembler);
 
 #endif
