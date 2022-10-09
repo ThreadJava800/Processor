@@ -1,15 +1,12 @@
 PUSH 0
 PUSH 4
 PUSH 3
-PUSH 12367
 POP [1]
 POP rcx
 POP [rcx]
-PUSH rax
+PUSH rcx
 PUSH [1]
-PUSH [3 + rcx]
-JMP 1
-1:
+PUSH [0 + rcx]
 OUT
 DUMP
 HLT

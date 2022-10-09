@@ -79,16 +79,11 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
     cpu->stack = stack;
 
 
-    for (size_t ip = 0; ip < count * sizeof(int); ip++) {
-        int com = commands[ip] & 0xF, args = commands[ip] >> 4;
+    while(cpu->commands[cpu->ip] != 0) {
+        char com = commands[cpu->ip] & 0xF, args = commands[cpu->ip] >> 4;
         switch(com) {
             case PUSH:
-                errorCode = push(cpu, *(commands + ip + sizeof(char)), args);
-                if (args >= rMask + mMask) {
-                    ip += 2 * sizeof(int);
-                } else  {
-                    ip += sizeof(int);
-                }
+                errorCode = push(cpu, args);
                 break;
             case ADD:
                 errorCode = add(&cpu->stack);
@@ -109,12 +104,7 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
                 errorCode = mul(&cpu->stack);
                 break;
             case POP:
-                if (args != 0) {
-                    errorCode = pop(cpu, args, *(commands + ip + sizeof(char)));
-                    ip += sizeof(int);
-                } else {
-                    errorCode = pop(cpu, args);
-                }
+                errorCode = pop(cpu, args);
                 break;
             case HLT:
                 hlt();
@@ -126,42 +116,65 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
                 errorCode = UNKNOWN_COMMAND;
                 break;
         }
+        cpu->ip++;
     }
-
-    free(commands);
-    stackDtor(&stack, &errorCode);
 
     return errorCode;
 }
 
 int freeCpu(Cpu_t *cpu) {
     if (!cpu) return CPU_NULL;
-    if (cpu->commands) free(cpu->commands);
-    if (cpu->reg) free(cpu->reg);
-    if (cpu->ram) free(cpu->ram);
+
+    // cpu->commands -= cpu->ip;
+    // if (cpu->commands) free(cpu->commands);
     stackDtor(&cpu->stack);
 
     return NO_ERROR;
 }
 
-int push(Cpu_t *cpu, int value, int mode) {
-    int pushVal = value, errorCode = NO_ERROR;
-    //printf("%d ", rMask + mMask);
+int push(Cpu_t *cpu, char mode) {
+    int pushVal = -1, errorCode = NO_ERROR;
+    int value1 = *(int *)(cpu->commands + cpu->ip + sizeof(char)), value2 = *(int *)(cpu->commands + cpu->ip + sizeof(char) + sizeof(int));
 
-    if (mode * 16 == rMask) {
-        pushVal = cpu->reg[value];
+    mode <<= 4;
+
+    if (mode & iMask) {
+        if (mode & rMask) {
+            if (mode & mMask) {
+                pushVal = cpu->ram[value1 + cpu->reg[value2]];
+                printf("test %d ", pushVal);
+                cpu->ip += 2 * sizeof(int);
+            }
+            else {
+                pushVal = value1 + cpu->reg[value2];
+                cpu->ip += 2 * sizeof(int);
+            }
+        }
+        else if (mode & mMask) {
+            pushVal = cpu->ram[value1];
+                cpu->ip += sizeof(int);
+        }
+        else {
+            pushVal = value1;
+            cpu->ip += sizeof(int);
+        }
+    }
+    else if (mode & rMask) {
+        if (mode & mMask) {
+            pushVal = cpu->ram[cpu->reg[value1]];
+            cpu->ip += sizeof(int);
+        }
+        else {
+            pushVal = cpu->reg[value1];
+            cpu->ip += sizeof(int);
+        }
+    } 
+    else {
+        errorCode = UNKNOWN_COMMAND;
     }
 
-    if (mode * 16 == iMask + mMask) {
-        pushVal = cpu->ram[value];
-    }
+    if (!errorCode) stackPush(&cpu->stack, pushVal, &errorCode);
 
-    if (mode * 16 == rMask + mMask) {
-        //printf("%d ", cpu->ram[cpu->reg[value]]);
-        pushVal = cpu->ram[cpu->reg[value]];
-    }
-
-    stackPush(&cpu->stack, pushVal, &errorCode);
     return errorCode;
 }
 
@@ -221,25 +234,39 @@ int sub(Stack_t *stack) {
     return errorCode;
 }
 
-int pop(Cpu_t *cpu, int mode, int arg) {
+int pop(Cpu_t *cpu, char mode) {
     int errorCode = NO_ERROR;
+    int value1 = *(int *)(cpu->commands + cpu->ip + sizeof(char)), value2 = *(int *)(cpu->commands + cpu->ip + sizeof(char) + sizeof(int));
 
-    int value = stackPop(&cpu->stack, &errorCode);
-    if (errorCode) return errorCode;
+    mode <<= 4;
+    int popVal = stackPop(&cpu->stack, &errorCode);
+    printf("%d ", popVal);
 
-    if (mode * 16 == mMask + iMask) {
-        cpu->ram[arg] = value;
+    if (mode & mMask) {
+        if (mode & iMask) {
+            if (mode & rMask) {
+                cpu->ram[value1 + cpu->reg[value2]] = popVal;
+                cpu->ip += 2 * sizeof(int);
+            }
+            else {
+                cpu->ram[value1] = popVal;
+                cpu->ip += sizeof(int);
+            }
+        }
+        else {
+            cpu->ram[cpu->reg[value1]] = popVal;
+            cpu->ip += sizeof(int);
+        }
+    }
+    else if (mode & rMask) {
+        cpu->reg[value1] = popVal;
+        cpu->ip += sizeof(int);
+    }
+    else {
+        errorCode = UNKNOWN_COMMAND;
     }
 
-    if (mode * 16 == mMask + rMask) {
-        cpu->ram[cpu->reg[arg]] = value;
-    }
-
-    if (mode * 16 == rMask) {
-        cpu->reg[arg] = value;
-    }
-
-    return UNKNOWN_COMMAND;
+    return errorCode;
 }
 
 void dump(Cpu_t *cpu, int errorCode, const char *file, const char *function, int line) {

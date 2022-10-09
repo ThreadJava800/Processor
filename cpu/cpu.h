@@ -16,6 +16,7 @@ struct Cpu_t {
     Stack_t stack = {};
     int *ram = nullptr;
     int *reg = nullptr;
+    int ip = 0;
 };
 
 enum CpuErrorCodes {
@@ -44,7 +45,7 @@ int parseCommands(FILE *file, Cpu_t *cpu);
 
 int freeCpu(Cpu_t *cpu);
 
-int push(Cpu_t *cpu, int value, int mode);
+int push(Cpu_t *cpu,  char mode);
 
 int add(Stack_t *stack);
 
@@ -58,7 +59,7 @@ int mul(Stack_t *stack);
 
 int sub(Stack_t *stack);
 
-int pop(Cpu_t *cpu, int mode, int arg = -1);
+int pop(Cpu_t *cpu, char mode);
 
 void dump(Cpu_t *cpu, int errorCode, const char *file, const char *function, int line);
 
