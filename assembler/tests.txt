@@ -5,8 +5,9 @@ POP [1]
 POP rcx
 POP [rcx]
 PUSH rcx
+1:
 PUSH [1]
-PUSH [0 + rcx]
-OUT
 DUMP
+JMP 1
+OUT
 HLT

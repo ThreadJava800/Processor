@@ -81,6 +81,7 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
 
     while(cpu->commands[cpu->ip] != 0) {
         char com = commands[cpu->ip] & 0xF, args = commands[cpu->ip] >> 4;
+        printf("%d %d %d\n", com, args, cpu->commands[cpu->ip]);
         switch(com) {
             case PUSH:
                 errorCode = push(cpu, args);
@@ -105,6 +106,9 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
                 break;
             case POP:
                 errorCode = pop(cpu, args);
+                break;
+            case JMP:
+                errorCode = jmp(cpu);
                 break;
             case HLT:
                 hlt();
@@ -240,7 +244,7 @@ int pop(Cpu_t *cpu, char mode) {
 
     mode <<= 4;
     int popVal = stackPop(&cpu->stack, &errorCode);
-    printf("%d ", popVal);
+    //printf("%d ", popVal);
 
     if (mode & mMask) {
         if (mode & iMask) {
@@ -267,6 +271,16 @@ int pop(Cpu_t *cpu, char mode) {
     }
 
     return errorCode;
+}
+
+int jmp(Cpu_t *cpu) {
+    if (!cpu) return COMMANDS_NULL;
+    if (!cpu->commands) return COMMANDS_NULL;
+
+    int position = *(int *)(cpu->commands + cpu->ip + sizeof(char));
+    cpu->ip = position - 2;
+
+    return NO_ERROR;
 }
 
 void dump(Cpu_t *cpu, int errorCode, const char *file, const char *function, int line) {

@@ -61,6 +61,8 @@ int sub(Stack_t *stack);
 
 int pop(Cpu_t *cpu, char mode);
 
+int jmp(Cpu_t *cpu);
+
 void dump(Cpu_t *cpu, int errorCode, const char *file, const char *function, int line);
 
 void hlt();
