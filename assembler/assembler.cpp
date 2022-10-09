@@ -76,6 +76,12 @@ int translateCommand(Assembler_t *assembler, int *labels){
                     assembler->machineCommands += sizeof(int);
                     assembler->commandBytes += sizeof(int);
 
+                    if (count == 2) {
+                        memcpy(assembler->machineCommands, &arg2, sizeof(int));
+                        assembler->machineCommands += sizeof(int);
+                        assembler->commandBytes += sizeof(int);
+                    }
+
                     assembler->commandCount += 2;
                 } else if (j == JMP) {
                     int commandIp = 0;
@@ -152,80 +158,42 @@ int generateMachineFile(Assembler_t *assembler, const char *fileName) {
 int parseLine(char *buf, int *count, char *commandId, int *arg1, int *arg2) {
     if (!buf || !count || !commandId || !arg1 || !arg2) return NULL_PTR;
 
-    char command[MAX_COMMAND_LENGTH] = {};
+    *count = 0;
+    int ram = -1, reg = -1; 
 
-    char dj[MAX_COMMAND_LENGTH];
-    int a, b;
-    int tmp = sscanf("PUSH [3]", "%s %d", dj, &b, dj);
-    //printf("%d %s", tmp, dj);
+    while (*buf != '\0') {
+        if (*buf == 'r' && *(buf + 2) == 'x') {
+            *commandId |= rMask;
+            reg = *(buf + 1) - 'a';
+            (*count)++;
 
-    // int val = sscanf(buf, "%s %3s %d", command, command, arg2);
-    // printf("%s %d %d", command, arg2, val);
-    // if (val == 2) {
-    //     if (sizeof(command) == 5 * 2) {         // utf-8
-    //         if (command[0] == 'r' && command[2] == 'x') {
-    //             *commandId = rMask + iMask + (*commandId);
-    //             *count = 2;
-    //             *arg1 = command[1] - 'a';
+            buf += 3;
+        } 
+        else if (*buf == '[') {
+            *commandId |= mMask;
 
-    //             return OK;
-    //         }
-
-    //         return INCORRECT_FORMAT;
-    //     } else {
-    //         return INCORRECT_FORMAT;
-    //     }
-    // }
-
-    // val = sscanf(buf, "%s [%s %d]", command, command, arg2);
-    // printf("%d", val);
-    // if (val == 2) {
-    //     printf("IN");
-    //     if (sizeof(command) == 5 * 2) {         // utf-8
-    //         if (command[0] == 'r' && command[2] == 'x') {
-    //             *commandId = mMask + rMask + iMask + (*commandId);
-    //             *count = 2;
-    //             *arg1 = command[1] - 'a';
-
-    //             return OK;
-    //         }
-
-    //         return INCORRECT_FORMAT;
-    //     } else {
-    //         return INCORRECT_FORMAT;
-    //     }
-    // }
-
-    int val = sscanf(buf, "%s %d", command, arg1);
-    if (val == 2) {
-        if (hasBrackets(buf) == 1) {
-            *commandId = mMask + iMask + (*commandId);
-        } else {
-            *commandId = iMask + (*commandId);
+            buf++;
         }
+        else if (isdigit(*buf) || *buf == '-') {
+            int value = 0, numberCount = 0;
+            sscanf(buf, "%d%n", &value, &numberCount);
+            
+            *commandId |= iMask;
+            *arg1 = ram = value;
+            (*count)++;
 
-        printf("%d ", *commandId);
-
-        *count = 1;
-        return OK;
+            buf += numberCount;
+        }
+        else {
+            buf++;
+        }
     }
 
-    val = sscanf(buf, "%s %s", command, command);
-    if (val == 2) {
-        if (sizeof(command) == 5 * 2) {         // utf-8
-            if (command[0] == 'r' && command[2] == 'x') {
-                if (hasBrackets(buf) == 1) {
-                    *commandId = mMask + rMask + (*commandId);
-                } else {
-                    *commandId = rMask + (*commandId);
-                }
-
-                *count = 1;
-                *arg1 = command[1] - 'a';
-            }
-        } else {
-            return INCORRECT_FORMAT;
-        }
+    if (*count == 2) {
+        *arg2 = reg;
+    }
+    if (*count == 1 && reg != -1) {
+        *arg1 = reg;
     }
 
     return INCORRECT_FORMAT;

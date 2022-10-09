@@ -7,7 +7,7 @@ POP rcx
 POP [rcx]
 PUSH rax
 PUSH [1]
-PUSH [rcx]
+PUSH [rcx + 3]
 JMP 1
 1:
 OUT
