@@ -41,9 +41,9 @@ int generateMachineFile(Assembler_t *assembler, const char *fileName);
 
 int hasBrackets(char *command);
 
-int parsePush(char *buf, int *count, char *commandId, int *arg1, int *arg2);
+int parsePushPop(Assembler_t *assembler, int ip, char commandId);
 
-int parsePop(char *buf, int *count, char *commandId, int *arg1, int *arg2);
+int parseJump(Assembler_t *assembler, int ip, int *needSecondCompile, int *labels);
 
 int freeAssembler(Assembler_t *assembler);
 

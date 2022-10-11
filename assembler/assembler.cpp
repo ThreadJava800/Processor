@@ -64,60 +64,13 @@ int compile(Assembler_t *assembler, int *labels){
 
             if (!strcasecmp(command, language[j])) {
                 if (j == CMD_PUSH || j == CMD_POP) {
-                    int count = 0, arg1 = 0, arg2 = 0;
-                    char commandId = j;
 
-                    parsePush(assembler->humanCommands.array[i], &count, &commandId, &arg1, &arg2);
-                    if (j == CMD_POP)  {
-                        if ((commandId & iMask) && !(commandId & mMask)) {
-                            fprintf(stderr, "%d %d\n", commandId, j);
-                            return INCORRECT_FORMAT;
-                        }
-                    }
-
-                    *assembler->machineCommands = commandId;
-                    assembler->machineCommands++;
-                    assembler->commandBytes++;
-
-                    memcpy(assembler->machineCommands, &arg1, sizeof(int));
-                    assembler->machineCommands += sizeof(int);
-                    assembler->commandBytes += sizeof(int);
-
-                    assembler->commandCount += 2;
-
-                    if (count == 2) {
-                        memcpy(assembler->machineCommands, &arg2, sizeof(int));
-                        assembler->machineCommands += sizeof(int);
-                        assembler->commandBytes += sizeof(int);
-                        assembler->commandCount++;
-                    }
+                    parsePushPop(assembler, i, j);
 
                 } else if (j == CMD_JMP) {
-                    int commandIp = 0;
-                    int valueAmount = sscanf(assembler->humanCommands.array[i], "%s %d", command, &commandIp);
 
-                    if (valueAmount == 2) {
-                        *assembler->machineCommands = j;
-                        assembler->machineCommands++;
-                        assembler->commandBytes++;
+                    parseJump(assembler, i, &needSecondCompile, labels);
 
-                        if (labels + commandIp) {
-                            if (labels[commandIp] != 0) {
-                                memcpy(assembler->machineCommands, &labels[commandIp], sizeof(int));
-                                assembler->machineCommands += sizeof(int);
-                                assembler->commandBytes += sizeof(int);
-                            } else {
-                                int poison = -1;
-                                memcpy(assembler->machineCommands, &poison, sizeof(int));
-                                assembler->machineCommands += sizeof(int);
-                                assembler->commandBytes += sizeof(int);
-
-                                needSecondCompile = 1;
-                            }
-                        }
-
-                        assembler->commandCount += 2;
-                    }
                 } else {
                     *assembler->machineCommands = j;
                     assembler->machineCommands++;
@@ -127,8 +80,7 @@ int compile(Assembler_t *assembler, int *labels){
                 }
 
                 break;
-            }
-            else { // if (strcasecmp(command, language[j]))
+            } else { // if (strcasecmp(command, language[j]))
                 int label = 0;
                 int successfuleInputs = sscanf(assembler->humanCommands.array[i], "%d:", &label);
                 if (successfuleInputs == 1) {
@@ -167,22 +119,23 @@ int generateMachineFile(Assembler_t *assembler, const char *fileName) {
     return OK;
 }
 
-int parsePush(char *buf, int *count, char *commandId, int *arg1, int *arg2) {
-    if (!buf || !count || !commandId || !arg1 || !arg2) return NULL_PTR;
+int parsePushPop(Assembler_t *assembler, int ip, char commandId) {
+    if (!assembler) return NULL_PTR;
 
-    *count = 0;
-    int ram = -1, reg = -1; 
+    char *buf = assembler->humanCommands.array[ip];
+    int ram = -1, reg = -1, count = 0; 
+    int arg1 = 0, arg2 = 0;
 
     while (*buf != '\0') {
         if (*buf == 'r' && *(buf + 2) == 'x') {
-            *commandId |= rMask;
+            commandId |= rMask;
             reg = *(buf + 1) - 'a';
-            (*count)++;
+            count++;
 
             buf += 3;
         } 
         else if (*buf == '[') {
-            *commandId |= mMask;
+            commandId |= mMask;
 
             buf++;
         }
@@ -190,9 +143,9 @@ int parsePush(char *buf, int *count, char *commandId, int *arg1, int *arg2) {
             int value = 0, numberCount = 0;
             sscanf(buf, "%d%n", &value, &numberCount);
             
-            *commandId |= iMask;
-            *arg1 = ram = value;
-            (*count)++;
+            commandId |= iMask;
+            arg1 = ram = value;
+            count++;
 
             buf += numberCount;
         }
@@ -201,14 +154,68 @@ int parsePush(char *buf, int *count, char *commandId, int *arg1, int *arg2) {
         }
     }
 
-    if (*count == 2) {
-        *arg2 = reg;
+    if ((commandId & 0xF) == CMD_POP)  {
+        if ((commandId & iMask) && !(commandId & mMask)) {
+            return INCORRECT_FORMAT;
+        }
     }
-    if (*count == 1 && reg != -1) {
-        *arg1 = reg;
+
+    *assembler->machineCommands = commandId;
+    assembler->machineCommands++;
+    assembler->commandBytes++;
+
+    if (count == 2) {
+        arg2 = reg;
+    }
+    if (count == 1 && reg != -1) {
+        arg1 = reg;
+    }
+
+    memcpy(assembler->machineCommands, &arg1, sizeof(int));
+    assembler->machineCommands += sizeof(int);
+    assembler->commandBytes += sizeof(int);
+
+    assembler->commandCount += 2;
+
+    if (count == 2) {
+        memcpy(assembler->machineCommands, &arg2, sizeof(int));
+        assembler->machineCommands += sizeof(int);
+        assembler->commandBytes += sizeof(int);
+        assembler->commandCount++;
     }
 
     return INCORRECT_FORMAT;
+}
+
+int parseJump(Assembler_t *assembler, int ip, int *needSecondCompile, int *labels) {
+    char buf[MAX_COMMAND_LENGTH] = {};
+    int commandIp = 0;
+    int valueAmount = sscanf(assembler->humanCommands.array[ip], "%s %d", buf, &commandIp);
+
+    if (valueAmount == 2) {
+        *assembler->machineCommands = CMD_JMP;
+        assembler->machineCommands++;
+        assembler->commandBytes++;
+
+        if (labels + commandIp) {
+            if (labels[commandIp] != 0) {
+                memcpy(assembler->machineCommands, &labels[commandIp], sizeof(int));
+                assembler->machineCommands += sizeof(int);
+                assembler->commandBytes += sizeof(int);
+            } else {
+                int poison = -1;
+                memcpy(assembler->machineCommands, &poison, sizeof(int));
+                assembler->machineCommands += sizeof(int);
+                assembler->commandBytes += sizeof(int);
+
+                *needSecondCompile = 1;
+            }
+        }
+
+        assembler->commandCount += 2;
+    }
+
+    return OK;
 }
 
 int hasBrackets(char *command) {

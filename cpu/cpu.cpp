@@ -56,6 +56,13 @@ int execute(char *fileName) {
     return errorCode;
 }
 
+#define DEF_CMD(name, num, code)    \
+    {                                \
+        case CMD_##name:              \
+            code                       \ 
+            break;                      \
+    }                                    \
+
 int parseCommands(FILE *file, Cpu_t *cpu) {
     size_t count = 0;
     int errorCode = NO_ERROR;
@@ -83,39 +90,9 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
         char com = commands[cpu->ip] & 0xF, args = commands[cpu->ip] >> 4;
         printf("%d %d %d\n", com, args, cpu->commands[cpu->ip]);
         switch(com) {
-            case PUSH:
-                errorCode = push(cpu, args);
-                break;
-            case ADD:
-                errorCode = add(&cpu->stack);
-                break;
-            case DIV:
-                errorCode = div(&cpu->stack);
-                break;
-            case OUT:
-                errorCode = out(&cpu->stack);
-                break;
-            case IN:
-                errorCode = in(&cpu->stack);
-                break;
-            case SUB:
-                errorCode = sub(&cpu->stack);
-                break;
-            case MUL:
-                errorCode = mul(&cpu->stack);
-                break;
-            case POP:
-                errorCode = pop(cpu, args);
-                break;
-            case JMP:
-                errorCode = jmp(cpu);
-                break;
-            case HLT:
-                hlt();
-                break;
-            case DUMP:
-                DUMP_CPU(cpu, errorCode);
-                break;
+
+            #include "../cmd.h"
+
             default:
                 errorCode = UNKNOWN_COMMAND;
                 break;
@@ -125,6 +102,8 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
 
     return errorCode;
 }
+
+#undef DEF_CMD
 
 int freeCpu(Cpu_t *cpu) {
     if (!cpu) return CPU_NULL;

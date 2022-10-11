@@ -1,4 +1,4 @@
-#define DEF_CMD(name, num) CMD_##name = num, \
+#define DEF_CMD(name, num, code) CMD_##name = num, \
       
 enum LanguageDict {
     #include "cmd.h"
@@ -7,7 +7,7 @@ enum LanguageDict {
 #undef DEF_CMD
 
 
-#define DEF_CMD(name, num) #name, \
+#define DEF_CMD(name, num, code) #name, \
 
 static const char *language[] = {
     #include "cmd.h"

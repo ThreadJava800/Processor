@@ -2,6 +2,7 @@ PUSH 0
 PUSH 4
 PUSH 3
 POP [1]
+POP 1
 POP rcx
 POP [rcx]
 PUSH rcx
