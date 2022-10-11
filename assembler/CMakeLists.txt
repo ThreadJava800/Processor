@@ -15,4 +15,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -W
 #-fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr")
 
 # add the executable
-add_executable(Assembler assembler.h assembler.cpp ../mlibs/onegin/onegin.h ../mlibs/onegin/onegin.cpp main.cpp)
+add_executable(Assembler ../config.h ../cmd.h assembler.h assembler.cpp ../mlibs/onegin/onegin.h ../mlibs/onegin/onegin.cpp main.cpp)

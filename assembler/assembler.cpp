@@ -63,12 +63,12 @@ int compile(Assembler_t *assembler, int *labels){
             sscanf(assembler->humanCommands.array[i], "%s", command);
 
             if (!strcasecmp(command, language[j])) {
-                if (j == PUSH || j == POP) {
+                if (j == CMD_PUSH || j == CMD_POP) {
                     int count = 0, arg1 = 0, arg2 = 0;
                     char commandId = j;
 
                     parsePush(assembler->humanCommands.array[i], &count, &commandId, &arg1, &arg2);
-                    if (j == POP)  {
+                    if (j == CMD_POP)  {
                         if ((commandId & iMask) && !(commandId & mMask)) {
                             fprintf(stderr, "%d %d\n", commandId, j);
                             return INCORRECT_FORMAT;
@@ -92,7 +92,7 @@ int compile(Assembler_t *assembler, int *labels){
                         assembler->commandCount++;
                     }
 
-                } else if (j == JMP) {
+                } else if (j == CMD_JMP) {
                     int commandIp = 0;
                     int valueAmount = sscanf(assembler->humanCommands.array[i], "%s %d", command, &commandIp);
 
@@ -125,6 +125,8 @@ int compile(Assembler_t *assembler, int *labels){
 
                     assembler->commandCount++;
                 }
+
+                break;
             }
             else { // if (strcasecmp(command, language[j]))
                 int label = 0;
