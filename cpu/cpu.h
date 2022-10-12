@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <malloc.h>
+#include <math.h>
 
 #include "../mlibs/onegin/onegin.h"
 #include "../mlibs/stack/stack.h"
@@ -8,7 +9,7 @@
 const int VERSION = 1;
 const int SIGNATURE = 74 * 256 + 67;  // CJ
 
-const int REGSIZE = 4;
+const int REGSIZE = 10;
 const int RAMSIZE = 100;
 
 struct Cpu_t {

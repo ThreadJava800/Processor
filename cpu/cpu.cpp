@@ -90,8 +90,7 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
 
 
     while(cpu->commands[cpu->ip] != 0) {
-        char com = commands[cpu->ip] & 0xF, args = commands[cpu->ip] >> 4;
-        //printf("%d\n", com);
+        char com = commands[cpu->ip] & 0x1F, args = commands[cpu->ip] >> 5;
         switch(com) {
 
             #include "../cmd.h"
@@ -122,7 +121,7 @@ int push(Cpu_t *cpu, char mode) {
     int pushVal = -1, errorCode = NO_ERROR;
     int value1 = *(int *)(cpu->commands + cpu->ip + sizeof(char)), value2 = *(int *)(cpu->commands + cpu->ip + sizeof(char) + sizeof(int));
 
-    mode <<= 4;
+    mode <<= 5;
 
     if (mode & iMask) {
         if (mode & rMask) {
@@ -224,7 +223,7 @@ int pop(Cpu_t *cpu, char mode) {
     int errorCode = NO_ERROR;
     int value1 = *(int *)(cpu->commands + cpu->ip + sizeof(char)), value2 = *(int *)(cpu->commands + cpu->ip + sizeof(char) + sizeof(int));
 
-    mode <<= 4;
+    mode <<= 5;
     int popVal = stackPop(&cpu->stack, &errorCode);
 
     if (mode & mMask) {

@@ -15,6 +15,6 @@ static const char *language[] = {
 
 #undef DEF_CMD
 
-const char iMask = 0x10;
-const char rMask = 0x20;
-const char mMask = 0x40;
+const char iMask = 0x20;
+const char rMask = 0x40;
+const char mMask = 0x80;

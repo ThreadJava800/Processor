@@ -155,7 +155,7 @@ int parsePushPop(Assembler_t *assembler, int ip, char commandId) {
         }
     }
 
-    if ((commandId & 0xF) == CMD_POP)  {
+    if ((commandId & 0x1F) == CMD_POP)  {
         if ((commandId & iMask) && !(commandId & mMask)) {
             return INCORRECT_FORMAT;
         }

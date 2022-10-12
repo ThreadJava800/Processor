@@ -85,3 +85,8 @@ DEF_CMD(JE, 18, {\
 DEF_CMD(JNE, 19, {\
     JUMP_HELPER(!=)
 }, 2)
+
+DEF_CMD(SQRT, 20, {\
+    double val = sqrt(POP);
+    stackPush(&cpu->stack, floor(val), &errorCode);
+}, 0)
