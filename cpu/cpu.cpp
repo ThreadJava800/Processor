@@ -56,12 +56,12 @@ int execute(char *fileName) {
     return errorCode;
 }
 
-#define DEF_CMD(name, num, code)    \
-    {                                \
-        case CMD_##name:              \
-            code                       \ 
-            break;                      \
-    }                                    \
+#define DEF_CMD(name, num, code, args)    \
+    {                                      \
+    case CMD_##name:                        \
+            code                             \ 
+            break;                            \
+    }                                          \
 
 int parseCommands(FILE *file, Cpu_t *cpu) {
     size_t count = 0;

@@ -1,4 +1,5 @@
 CALL 1
+JB 
 DUMP
 HLT
 

@@ -47,6 +47,26 @@ int execute(const char *fileName, const char *outputName) {
     return error;
 }
 
+#define DEF_CMD(name, num, code, args)                                     \                                                                                                                                       
+    if (!strcasecmp(command, #name)) {                                      \
+        if (args == 1) {                                                     \
+                                                                              \
+            parsePushPop(assembler, i, num);                                   \
+                                                                                \
+        } else if (args == 2) {                                                  \
+                                                                                  \
+            parseJumpCall(assembler, i, num, &needSecondCompile, labels);          \
+                                                                                    \
+        } else {                                                                     \   
+            *assembler->machineCommands = num;                                        \
+            assembler->machineCommands++;                                              \
+            assembler->commandBytes++;                                                  \
+                                                                                         \
+            assembler->commandCount++;                                                    \
+        }                                                                                  \
+                                                                                            \                                                                               
+    } else                                                                                                                                                                                                                                                                                                                                                                                                                              
+
 int compile(Assembler_t *assembler, int *labels){ 
     if (!assembler) return NULL_PTR;
     if (!assembler->machineCommands || !assembler->humanCommands.array) return NULL_PTR;
@@ -55,39 +75,18 @@ int compile(Assembler_t *assembler, int *labels){
     int needSecondCompile = 0;
 
     for (int i = 0; i < assembler->humanCommands.size; i++) {
-        int languageLen = sizeof(language) / sizeof(language[0]);
+        char command[MAX_COMMAND_LENGTH] = {};
+        sscanf(assembler->humanCommands.array[i], "%s", command);
 
-        for (char j = 0; j < languageLen; j++) {
-            char command[MAX_COMMAND_LENGTH] = {};
+        #include "../cmd.h"
 
-            sscanf(assembler->humanCommands.array[i], "%s", command);
-
-            if (!strcasecmp(command, language[j])) {
-                if (j == CMD_PUSH || j == CMD_POP) {
-
-                    parsePushPop(assembler, i, j);
-
-                } else if (j == CMD_JMP || j == CMD_CALL) {
-
-                    parseJumpCall(assembler, i, j, &needSecondCompile, labels);
-
-                } else {
-                    *assembler->machineCommands = j;
-                    assembler->machineCommands++;
-                    assembler->commandBytes++;
-
-                    assembler->commandCount++;
-                }
-
-                break;
-            } else { // if (strcasecmp(command, language[j]))
-                int label = 0;
-                int successfuleInputs = sscanf(assembler->humanCommands.array[i], "%d:", &label);
-                if (successfuleInputs == 1) {
-                    labels[label] = assembler->commandBytes + 1;
-                }
-            }
-        }
+        /* else */ { 
+            int label = 0;                                                                         
+            int successfuleInputs = sscanf(assembler->humanCommands.array[i], "%d:", &label);       
+            if (successfuleInputs == 1) {                                                            
+                labels[label] = assembler->commandBytes + 1;                                          
+            }  
+        }  
     }
 
     assembler->machineCommands -= assembler->commandBytes;
@@ -100,6 +99,8 @@ int compile(Assembler_t *assembler, int *labels){
 
     return OK;
 }
+
+#undef DEF_CMD
 
 int generateMachineFile(Assembler_t *assembler, const char *fileName) {
     if (!assembler) return NULL_PTR;
