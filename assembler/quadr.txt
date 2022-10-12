@@ -10,9 +10,7 @@ MUL
 POP rcx
 POP rbx
 POP rax
-CALL 1
-CALL 2
-CALL 3
+CALL 8
 HLT
 
 1:
@@ -25,10 +23,20 @@ PUSH rbx
 PUSH rbx
 MUL
 SUB
+POP rdx
+PUSH 0
+PUSH rdx
+JAE 7
+HLT
+RET
+
+7:
+PUSH rdx
 SQRT
 PUSH 100
 MUL
 POP rdx
+CALL 4
 RET
 
 2:
@@ -56,3 +64,51 @@ SUB
 DIV
 DUMP
 RET
+
+4:
+PUSH 0
+PUSH rdx
+JE 5
+PUSH 0
+PUSH rdx
+JA 6
+HLT
+RET
+
+5:
+CALL 2
+HLT
+RET
+
+6:
+CALL 2
+CALL 3
+HLT
+RET
+
+8:
+PUSH 0
+PUSH rax
+JE 9
+JMP 1
+RET
+
+9:
+PUSH 0
+PUSH rbx
+JE 10
+JMP 1
+RET
+
+10:
+PUSH 0
+PUSH rcx
+JE 11
+JMP 1
+RET
+
+11:
+HLT
+RET
+
+// рассм случаи линейного и конст = 0!!!
