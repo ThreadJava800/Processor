@@ -14,6 +14,7 @@ const int RAMSIZE = 100;
 struct Cpu_t {
     char *commands = nullptr;
     Stack_t stack = {};
+    Stack_t callStack = {};
     int *ram = nullptr;
     int *reg = nullptr;
     int ip = 0;

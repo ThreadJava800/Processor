@@ -67,9 +67,9 @@ int compile(Assembler_t *assembler, int *labels){
 
                     parsePushPop(assembler, i, j);
 
-                } else if (j == CMD_JMP) {
+                } else if (j == CMD_JMP || j == CMD_CALL) {
 
-                    parseJump(assembler, i, &needSecondCompile, labels);
+                    parseJumpCall(assembler, i, j, &needSecondCompile, labels);
 
                 } else {
                     *assembler->machineCommands = j;
@@ -187,13 +187,13 @@ int parsePushPop(Assembler_t *assembler, int ip, char commandId) {
     return INCORRECT_FORMAT;
 }
 
-int parseJump(Assembler_t *assembler, int ip, int *needSecondCompile, int *labels) {
+int parseJumpCall(Assembler_t *assembler, int ip, char commandType, int *needSecondCompile, int *labels) {
     char buf[MAX_COMMAND_LENGTH] = {};
     int commandIp = 0;
     int valueAmount = sscanf(assembler->humanCommands.array[ip], "%s %d", buf, &commandIp);
 
     if (valueAmount == 2) {
-        *assembler->machineCommands = CMD_JMP;
+        *assembler->machineCommands = commandType;
         assembler->machineCommands++;
         assembler->commandBytes++;
 

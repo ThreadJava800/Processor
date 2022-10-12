@@ -43,7 +43,7 @@ int hasBrackets(char *command);
 
 int parsePushPop(Assembler_t *assembler, int ip, char commandId);
 
-int parseJump(Assembler_t *assembler, int ip, int *needSecondCompile, int *labels);
+int parseJumpCall(Assembler_t *assembler, int ip, char commandType, int *needSecondCompile, int *labels);
 
 int freeAssembler(Assembler_t *assembler);
 

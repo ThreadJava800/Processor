@@ -1,14 +1,9 @@
+CALL 1
+DUMP
+HLT
+
+1:
 PUSH 0
 PUSH 4
 PUSH 3
-POP [1]
-POP 1
-POP rcx
-POP [rcx]
-PUSH rcx
-1:
-PUSH [1]
-DUMP
-JMP 1
-OUT
-HLT
+ret

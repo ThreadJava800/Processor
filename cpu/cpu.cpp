@@ -76,7 +76,9 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
     fread(commands, sizeof(int), count, file);
 
     Stack_t stack = {};
+    Stack_t callStack = {};
     stackCtor(&stack, 1);
+    stackCtor(&callStack, 1);
     int reg[REGSIZE] = {}; 
     int ram[RAMSIZE] = {};
 
@@ -84,11 +86,12 @@ int parseCommands(FILE *file, Cpu_t *cpu) {
     cpu->reg = reg;
     cpu->ram = ram;
     cpu->stack = stack;
+    cpu->callStack = callStack;
 
 
     while(cpu->commands[cpu->ip] != 0) {
         char com = commands[cpu->ip] & 0xF, args = commands[cpu->ip] >> 4;
-        printf("%d %d %d\n", com, args, cpu->commands[cpu->ip]);
+        //printf("%d\n", com);
         switch(com) {
 
             #include "../cmd.h"
@@ -223,7 +226,6 @@ int pop(Cpu_t *cpu, char mode) {
 
     mode <<= 4;
     int popVal = stackPop(&cpu->stack, &errorCode);
-    //printf("%d ", popVal);
 
     if (mode & mMask) {
         if (mode & iMask) {

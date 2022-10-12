@@ -3,6 +3,7 @@ DEF_CMD(HLT, 0, {
 })
 
 DEF_CMD(PUSH, 1, {
+    //printf("%d\n", cpu->ip);
     errorCode = push(cpu, args);
 })
 
@@ -40,4 +41,14 @@ DEF_CMD(POP, 9, {
 
 DEF_CMD(JMP, 10, {
     errorCode = jmp(cpu);
+})
+
+DEF_CMD(CALL, 11, {
+    stackPush(&cpu->callStack, cpu->ip + sizeof(char) + sizeof(int), &errorCode);
+    errorCode = jmp(cpu);
+    //printf("%d ", cpu->ip);
+})
+
+DEF_CMD(RET, 12, {\
+    cpu->ip = stackPop(&cpu->callStack, &errorCode) - 1;
 })
