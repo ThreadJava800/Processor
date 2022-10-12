@@ -1,9 +1,12 @@
-#define POP stackPop(&cpu->stack, &errorCode);
+#define POP stackPop(&cpu->stack, &errorCode)
+
 
 #define JUMP_HELPER(sign)   \
     if (POP sign POP) {      \
         jmp(cpu);             \
-    }                          
+    } else {                   \
+        cpu->ip += sizeof(int); \  
+    }                        
 
 
 DEF_CMD(HLT, 0, {
@@ -61,24 +64,24 @@ DEF_CMD(RET, 12, {\
 
 DEF_CMD(JB, 13, {\
     JUMP_HELPER(<)
-}, 0)
+}, 2)
 
 DEF_CMD(JA, 15, {\
     JUMP_HELPER(>)
-}, 0)
+}, 2)
 
 DEF_CMD(JAE, 16, {\
     JUMP_HELPER(>=)
-}, 0)
+}, 2)
 
 DEF_CMD(JBE, 17, {\
     JUMP_HELPER(<=)
-}, 0)
+}, 2)
 
 DEF_CMD(JE, 18, {\
     JUMP_HELPER(==)
-}, 0)
+}, 2)
 
 DEF_CMD(JNE, 19, {\
     JUMP_HELPER(!=)
-}, 0)
+}, 2)

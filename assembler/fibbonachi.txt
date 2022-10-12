@@ -1,0 +1,38 @@
+PUSH 0
+PUSH 1
+PUSH 1
+POP rax
+POP rbx
+POP rdx
+PUSH 2
+IN
+SUB
+POP rcx
+CALL 2
+CALL 1
+
+
+1:
+DUMP
+OUT
+HLT
+ret
+
+2:
+PUSH rbx
+PUSH rax
+POP rbx
+POP rax
+PUSH rax
+PUSH rbx
+ADD
+POP rbx
+PUSH 1
+PUSH rdx
+ADD
+POP rdx
+PUSH rdx
+PUSH rcx
+JA 2
+PUSH rbx
+ret
