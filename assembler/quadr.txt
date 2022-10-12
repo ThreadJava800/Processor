@@ -11,6 +11,8 @@ POP rcx
 POP rbx
 POP rax
 CALL 1
+CALL 2
+CALL 3
 HLT
 
 1:
@@ -23,10 +25,34 @@ PUSH rbx
 PUSH rbx
 MUL
 SUB
-DUMP
 SQRT
-DUMP
 PUSH 100
 MUL
 POP rdx
+RET
+
+2:
+PUSH 2
+PUSH rax
+MUL
+PUSH -1
+PUSH rbx
+MUL
+PUSH rdx
+ADD
+DIV
+DUMP
+RET
+
+3:
+PUSH 2
+PUSH rax
+MUL
+PUSH rdx
+PUSH -1
+PUSH rbx
+MUL
+SUB
+DIV
+DUMP
 RET

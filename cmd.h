@@ -88,5 +88,5 @@ DEF_CMD(JNE, 19, {\
 
 DEF_CMD(SQRT, 20, {\
     double val = sqrt(POP);
-    stackPush(&cpu->stack, floor(val), &errorCode);
+    stackPush(&cpu->stack, floor(val) / 100, &errorCode);
 }, 0)
