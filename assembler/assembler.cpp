@@ -28,8 +28,9 @@ int execute(const char *fileName, const char *outputName) {
     error = checkCommands(&commands);
     if (error) return error;
 
-    char *machineCommands = (char *) calloc(2 * commands.size, sizeof(int));
-    if (!machineCommands) return NULL_PTR;
+    char *machineCommands = (char *) calloc(3 * commands.size, sizeof(int));
+    Label_t *labels = (Label_t *) calloc(commands.size, sizeof(Label_t));
+    if (!machineCommands || !labels) return NULL_PTR;
 
     Assembler_t assembler = {
         .commandBytes = 0,
@@ -38,7 +39,8 @@ int execute(const char *fileName, const char *outputName) {
         .humanCommands = commands,
     };
 
-    error = compile(&assembler);
+    int labelCount = 0;
+    error = compile(&assembler, labels, &labelCount);
 
     generateMachineFile(&assembler, outputName);
 
@@ -47,31 +49,30 @@ int execute(const char *fileName, const char *outputName) {
     return error;
 }
 
-#define DEF_CMD(name, num, code, args)                                     \                                                                                                                                       
-    if (!strcasecmp(command, #name)) {                                      \
-        if (args == 1) {                                                     \
-                                                                              \
-            parsePushPop(assembler, i, num);                                   \
-                                                                                \
-        } else if (args == 2) {                                                  \
-                                                                                  \
-            parseJumpCall(assembler, i, num, &needSecondCompile, labels);          \
+#define DEF_CMD(name, num, code, args)                                           \                                                                                                                                       
+    if (!strcasecmp(command, #name)) {                                            \
+        if (args == 1) {                                                           \
                                                                                     \
-        } else {                                                                     \   
-            *assembler->machineCommands = num;                                        \
-            assembler->machineCommands++;                                              \
-            assembler->commandBytes++;                                                  \
-                                                                                         \
-            assembler->commandCount++;                                                    \
-        }                                                                                  \
-                                                                                            \                                                                               
+            parsePushPop(assembler, i, num);                                         \
+                                                                                      \
+        } else if (args == 2) {                                                        \
+                                                                                        \
+            parseJumpCall(assembler, i, num, &needSecondCompile, labels, labelCount);    \
+                                                                                          \
+        } else {                                                                           \   
+            *assembler->machineCommands = num;                                              \
+            assembler->machineCommands++;                                                    \
+            assembler->commandBytes++;                                                        \
+                                                                                               \
+            assembler->commandCount++;                                                          \
+        }                                                                                        \
+                                                                                                  \                                                                               
     } else                                                                                                                                                                                                                                                                                                                                                                                                                              
 
-int compile(Assembler_t *assembler, int *labels){ 
-    if (!assembler) return NULL_PTR;
+int compile(Assembler_t *assembler, Label_t *labels, int *labelCount, int compileCount){ 
+    if (!assembler || !labelCount || !labels) return NULL_PTR;
     if (!assembler->machineCommands || !assembler->humanCommands.array) return NULL_PTR;
 
-    if (!labels) labels = (int *) calloc(assembler->humanCommands.size, sizeof(int));
     int needSecondCompile = 0;
 
     for (int i = 0; i < assembler->humanCommands.size; i++) {
@@ -81,20 +82,39 @@ int compile(Assembler_t *assembler, int *labels){
         #include "../cmd.h"
 
         /* else */ { 
-            int label = 0;                                                                         
-            int successfuleInputs = sscanf(assembler->humanCommands.array[i], "%d:", &label);       
-            if (successfuleInputs == 1) {                                                            
-                labels[label] = assembler->commandBytes + 1;                                          
+            char label[MAX_LABEL_LEN] = {};
+            int labelLen = 0;                                                               
+            int successfuleInputs = sscanf(assembler->humanCommands.array[i], "%s%n", label, &labelLen);  
+
+            if (successfuleInputs == 1) {
+                int metLabel = 0;
+                for (int i = 0; i < *labelCount; i++) {
+                    if (!strcasecmp(labels[i].labelTxt, label)) {
+                        metLabel = 1;
+                    }
+                }
+
+                if (!metLabel) {
+                    label[labelLen - 1] = '\0';         //removing :
+                    strcpy(labels[*labelCount].labelTxt, label);
+                    labels[*labelCount].gotoIp = assembler->commandBytes + 1;
+                    (*labelCount)++;
+                }                                          
             }  
         }  
     }
 
     assembler->machineCommands -= assembler->commandBytes;
+    compileCount++;
+
+    if (compileCount > MAX_COMPILE_ATTEMPTS) {
+        return TOO_MANY_COMPILES;
+    }
 
     if (needSecondCompile) {
         assembler->commandBytes = 0;
         assembler->commandCount = 0;
-        compile(assembler, labels);
+        compile(assembler, labels, labelCount, compileCount);
     }
 
     return OK;
@@ -188,29 +208,28 @@ int parsePushPop(Assembler_t *assembler, int ip, char commandId) {
     return INCORRECT_FORMAT;
 }
 
-int parseJumpCall(Assembler_t *assembler, int ip, char commandType, int *needSecondCompile, int *labels) {
+int parseJumpCall(Assembler_t *assembler, int ip, char commandType, int *needSecondCompile, Label_t *labels, int *labelCount) {
     char buf[MAX_COMMAND_LENGTH] = {};
-    int commandIp = 0;
-    int valueAmount = sscanf(assembler->humanCommands.array[ip], "%s %d", buf, &commandIp);
+    int valueAmount = sscanf(assembler->humanCommands.array[ip], "%s %s", buf, buf);
+    int labelIndex = *labelCount - 1;
+    if (*labelCount == 0) labelIndex = 0;
 
     if (valueAmount == 2) {
         *assembler->machineCommands = commandType;
         assembler->machineCommands++;
         assembler->commandBytes++;
 
-        if (labels + commandIp) {
-            if (labels[commandIp] != 0) {
-                memcpy(assembler->machineCommands, &labels[commandIp], sizeof(int));
-                assembler->machineCommands += sizeof(int);
-                assembler->commandBytes += sizeof(int);
-            } else {
-                int poison = -1;
-                memcpy(assembler->machineCommands, &poison, sizeof(int));
-                assembler->machineCommands += sizeof(int);
-                assembler->commandBytes += sizeof(int);
+        if (!strcasecmp(labels[ip].labelTxt, buf)) {
+            memcpy(assembler->machineCommands, &(labels[ip].gotoIp), sizeof(int));
+            assembler->machineCommands += sizeof(int);
+            assembler->commandBytes += sizeof(int);
+        } else {
+            int poison = -1;
+            memcpy(assembler->machineCommands, &poison, sizeof(int));
+            assembler->machineCommands += sizeof(int);
+            assembler->commandBytes += sizeof(int);
 
-                *needSecondCompile = 1;
-            }
+            *needSecondCompile = 1;
         }
 
         assembler->commandCount += 2;

@@ -1,9 +1,13 @@
-CALL 1
+CALL test
+CALL fuck
 DUMP
 HLT
 
-1:
+test:
 PUSH 0
+ret
+
+fuck:
 PUSH 4
 PUSH 3
 ret
