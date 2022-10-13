@@ -55,6 +55,6 @@ int parsePushPop(Assembler_t *assembler, int ip, char commandId);
 
 int parseJumpCall(Assembler_t *assembler, int ip, char commandType, int *needSecondCompile, Label_t *labels, int *labelCount);
 
-int freeAssembler(Assembler_t *assembler);
+int freeMemory(Assembler_t *assembler, Label_t *labels);
 
 #endif

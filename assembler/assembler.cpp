@@ -44,7 +44,7 @@ int execute(const char *fileName, const char *outputName) {
 
     generateMachineFile(&assembler, outputName);
 
-    freeAssembler(&assembler);
+    freeMemory(&assembler, labels);
 
     return error;
 }
@@ -209,28 +209,37 @@ int parsePushPop(Assembler_t *assembler, int ip, char commandId) {
 }
 
 int parseJumpCall(Assembler_t *assembler, int ip, char commandType, int *needSecondCompile, Label_t *labels, int *labelCount) {
+    if (!assembler || !needSecondCompile || !labels || !labelCount) return NULL_PTR;
+
     char buf[MAX_COMMAND_LENGTH] = {};
-    int valueAmount = sscanf(assembler->humanCommands.array[ip], "%s %s", buf, buf);
-    int labelIndex = *labelCount - 1;
-    if (*labelCount == 0) labelIndex = 0;
+    char test[MAX_COMMAND_LENGTH] = {};
+    int valueAmount = sscanf(assembler->humanCommands.array[ip], "%s%s", test, buf);
 
     if (valueAmount == 2) {
         *assembler->machineCommands = commandType;
         assembler->machineCommands++;
         assembler->commandBytes++;
 
-        if (!strcasecmp(labels[ip].labelTxt, buf)) {
-            memcpy(assembler->machineCommands, &(labels[ip].gotoIp), sizeof(int));
-            assembler->machineCommands += sizeof(int);
-            assembler->commandBytes += sizeof(int);
-        } else {
-            int poison = -1;
-            memcpy(assembler->machineCommands, &poison, sizeof(int));
-            assembler->machineCommands += sizeof(int);
-            assembler->commandBytes += sizeof(int);
+        int metLabel = 0;
+        for (int i = 0; i < *labelCount; i++) {
+            if (!strcmp(labels[i].labelTxt, buf)) {
+                memcpy(assembler->machineCommands, &(labels[i].gotoIp), sizeof(int));
+                assembler->machineCommands += sizeof(int);
+                assembler->commandBytes += sizeof(int);
 
-            *needSecondCompile = 1;
+                metLabel = 1;
+                break;
+            }
         }
+
+         if (!metLabel) {
+                int poison = -1;
+                memcpy(assembler->machineCommands, &poison, sizeof(int));
+                assembler->machineCommands += sizeof(int);
+                assembler->commandBytes += sizeof(int);
+
+                *needSecondCompile = 1;
+            }
 
         assembler->commandCount += 2;
     }
@@ -253,9 +262,10 @@ int hasBrackets(char *command) {
     return metBrackets == 2;
 }
 
-int freeAssembler(Assembler_t *assembler) {
-    if (!assembler) return NULL_PTR;
+int freeMemory(Assembler_t *assembler, Label_t *labels) {
+    if (!assembler || !labels) return NULL_PTR;
 
+    free(labels);
     free(assembler->machineCommands);
     freeStrings(&assembler->humanCommands);
 

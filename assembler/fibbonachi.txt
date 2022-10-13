@@ -8,17 +8,18 @@ PUSH 2
 IN
 SUB
 POP rcx
-CALL 2
-CALL 1
+CALL countFibbonachi
+CALL printValues
+HLT
 
 
-1:
+printValues:
 DUMP
 OUT
 HLT
 ret
 
-2:
+countFibbonachi:
 PUSH rbx
 PUSH rax
 POP rbx
@@ -33,6 +34,6 @@ ADD
 POP rdx
 PUSH rdx
 PUSH rcx
-JA 2
+JA countFibbonachi
 PUSH rbx
 ret
