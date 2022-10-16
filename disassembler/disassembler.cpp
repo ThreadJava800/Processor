@@ -50,8 +50,6 @@ int translateCommand(FILE *input, FILE *output, int *labels) {
     poisonLabels(labels, header[2] * 3);
     errorCode = readLabels(commands, header[2], labels);
 
-    // fprintf(stderr, "%d ", labels[58]);
-
     int commandCount = 0, ip = 0;
 
     while (commandCount < header[2]) {
@@ -132,7 +130,6 @@ int readLabels(char *commands, int comSize, int *labels) {
 int addLabel(int *labels, int label) {
     if (!labels) return NULL_PTR;
 
-    fprintf(stderr, "%d ",  labels[label]);
     if (labels[label] == -1) {
         labels[label] = label;
     }
@@ -161,7 +158,7 @@ int printCommand(FILE *output, char maskArgs, char popArgs, char *commands, int 
     }
 
     if (popArgs == 2) {
-        fprintf(output, "%s label_%d\n", language[com], *((int *)(commands + sizeof(char))));
+        fprintf(output, "%s label_%d\n", language[com], *((int *)(commands + *ip + sizeof(char))));
 
         (*commandCount) += 2;
         (*ip) += sizeof(char) + sizeof(int);

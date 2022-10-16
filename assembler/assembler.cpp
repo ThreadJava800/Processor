@@ -96,6 +96,7 @@ int compile(Assembler_t *assembler, Label_t *labels, int *labelCount, int compil
 
                 if (!metLabel) {
                     label[labelLen - 1] = '\0';         //removing :
+                    //printf("%s\n", label);
                     strcpy(labels[*labelCount].labelTxt, label);
                     labels[*labelCount].gotoIp = assembler->commandBytes + 1;
                     (*labelCount)++;

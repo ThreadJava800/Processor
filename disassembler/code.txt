@@ -1,9 +1,112 @@
-CALL label_20
-PUSH rax+5
-PUSH [5]
-
-label_20:
-PUSH rax
-PUSH [rax+5]
+IN
+PUSH 100
+MUL
+IN
+PUSH 100
+MUL
+IN
+PUSH 100
+MUL
+POP rcx
+POP rbx
 POP rax
+CALL label_230
+HLT
+
+label_43:
+PUSH rcx
+PUSH rax
+PUSH 4
+MUL
+MUL
+PUSH rbx
+PUSH rbx
+MUL
+SUB
+POP rdx
+PUSH 0
+PUSH rdx
+JAE label_94
+HLT
+RET
+
+label_94:
+PUSH rdx
+SQRT
+PUSH 100
+MUL
+POP rdx
+CALL label_179
+RET
+
+label_117:
+PUSH 2
+PUSH rax
+MUL
+PUSH -1
+PUSH rbx
+MUL
+PUSH rdx
+ADD
+DIV
+DUMP
+RET
+
+label_148:
+PUSH 2
+PUSH rax
+MUL
+PUSH rdx
+PUSH -1
+PUSH rbx
+MUL
+SUB
+DIV
+DUMP
+RET
+
+label_179:
+PUSH 0
+PUSH rdx
+JE label_211
+PUSH 0
+PUSH rdx
+JA label_218
+HLT
+RET
+
+label_211:
+CALL label_117
+HLT
+RET
+
+label_218:
+CALL label_117
+CALL label_148
+HLT
+RET
+
+label_230:
+PUSH 0
+PUSH rax
+JE label_251
+JMP label_43
+RET
+
+label_251:
+PUSH 0
+PUSH rbx
+JE label_272
+JMP label_43
+RET
+
+label_272:
+PUSH 0
+PUSH rcx
+JE label_293
+JMP label_43
+RET
+
+label_293:
+HLT
 RET

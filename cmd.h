@@ -66,27 +66,27 @@ DEF_CMD(JB, 13, {\
     JUMP_HELPER(<)
 }, 2)
 
-DEF_CMD(JA, 15, {\
+DEF_CMD(JA, 14, {\
     JUMP_HELPER(>)
 }, 2)
 
-DEF_CMD(JAE, 16, {\
+DEF_CMD(JAE, 15, {\
     JUMP_HELPER(>=)
 }, 2)
 
-DEF_CMD(JBE, 17, {\
+DEF_CMD(JBE, 16, {\
     JUMP_HELPER(<=)
 }, 2)
 
-DEF_CMD(JE, 18, {\
+DEF_CMD(JE, 17, {\
     JUMP_HELPER(==)
 }, 2)
 
-DEF_CMD(JNE, 19, {\
+DEF_CMD(JNE, 18, {\
     JUMP_HELPER(!=)
 }, 2)
 
-DEF_CMD(SQRT, 20, {\
+DEF_CMD(SQRT, 19, {\
     double val = sqrt(POP);
     stackPush(&cpu->stack, floor(val) / 100, &errorCode);
 }, 0)
