@@ -1,11 +1,9 @@
-19011 1 16
-CALL
-JBE
-HLT
-HLT
-HLT
-PUSH rÂx+16
-HLT
-PUSH [16]
-PUSH rqx
-PUSH [rÂx+16]
+CALL label_20
+PUSH rax+5
+PUSH [5]
+
+label_20:
+PUSH rax
+PUSH [rax+5]
+POP rax
+RET

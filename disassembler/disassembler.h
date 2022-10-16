@@ -28,6 +28,6 @@ int addLabel(int *labels, int label);
 
 int createRegStr(char *str, int value);
 
-int printCommand(FILE *output, char maskArgs, char popArgs, char *commands, int *ip, int *commandCount);
+int printCommand(FILE *output, char maskArgs, char popArgs, char *commands, int *ip, int *commandCount, int *labels);
 
 #endif

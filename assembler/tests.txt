@@ -1,9 +1,8 @@
 CALL 3
 PUSH rax+5
-HLT
+PUSH [5]
 
 3:
-PUSH [5]
 PUSH rax
 PUSH [rax+5]
 POP rax

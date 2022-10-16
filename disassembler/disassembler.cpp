@@ -21,12 +21,12 @@ int parseMachineCode(const char *input, const char *output) {
     return errorCode;
 }
 
-#define DEF_CMD(name, num, code, args)                                          \
-    {                                                                            \
-    case CMD_##name:                                                              \
-        printCommand(output, commands[ip], args, commands, &ip, &commandCount);    \ 
-        break;                                                                      \
-    }                                                                                \
+#define DEF_CMD(name, num, code, args)                                                  \
+    {                                                                                    \
+    case CMD_##name:                                                                      \
+        printCommand(output, commands[ip], args, commands, &ip, &commandCount, labels);    \ 
+        break;                                                                              \
+    }                                                                                        \
 
 int translateCommand(FILE *input, FILE *output, int *labels) {
     int errorCode = NO_ERROR;
@@ -38,17 +38,16 @@ int translateCommand(FILE *input, FILE *output, int *labels) {
         return CANNOT_OPEN_FILE;
     }
 
-    fprintf(output, "%d %d %d\n", header[0], header[1], header[2]);
     char *commands = (char *) calloc(sizeof(int), header[2]);
     if (!commands) {
         return NULL_PTR;
     }
     fread(commands, sizeof(int), header[2], input);
 
-    if (!labels) labels = (int *) calloc(header[2], sizeof(int));
+    if (!labels) labels = (int *) calloc(header[2] * 3, sizeof(int));
     if (!labels) return NULL_PTR;
 
-    poisonLabels(labels, header[2]);
+    poisonLabels(labels, header[2] * 3);
     errorCode = readLabels(commands, header[2], labels);
 
     // fprintf(stderr, "%d ", labels[58]);
@@ -112,9 +111,6 @@ int readLabels(char *commands, int comSize, int *labels) {
 
     int comIp = 0, comNumber = 0;
     while (comNumber < comSize) {
-
-
-
         switch (commands[comIp] & 0x1F) {
             
             #include "../cmd.h"
@@ -124,7 +120,6 @@ int readLabels(char *commands, int comSize, int *labels) {
                 break;
         }  
 
-        //fprintf(stderr, "%d ", comNumber);
         comNumber++;
         comIp++;
     } 
@@ -137,6 +132,7 @@ int readLabels(char *commands, int comSize, int *labels) {
 int addLabel(int *labels, int label) {
     if (!labels) return NULL_PTR;
 
+    fprintf(stderr, "%d ",  labels[label]);
     if (labels[label] == -1) {
         labels[label] = label;
     }
@@ -156,35 +152,58 @@ int createRegStr(char *str, int value) {
     return NO_ERROR;
 }
 
-int printCommand(FILE *output, char maskArgs, char popArgs, char *commands, int *ip, int *commandCount) {
+int printCommand(FILE *output, char maskArgs, char popArgs, char *commands, int *ip, int *commandCount, int *labels) {
     int errorCode = NO_ERROR;
     char com = commands[*ip] & 0x1F, args = commands[*ip] & 0xE0;
+
+    if (labels[*ip + 1] != -1) {
+        fprintf(output, "\nlabel_%d:\n", labels[*ip + 1]);
+    }
+
+    if (popArgs == 2) {
+        fprintf(output, "%s label_%d\n", language[com], *((int *)(commands + sizeof(char))));
+
+        (*commandCount) += 2;
+        (*ip) += sizeof(char) + sizeof(int);
+
+        return NO_ERROR;
+    }
+
+    if (popArgs == 0) {
+        fprintf(output, "%s\n", language[com]);
+
+        (*commandCount) += 1;
+        (*ip) += sizeof(char);
+
+        return NO_ERROR;
+    } 
 
     if (args & iMask) {
         if (args & rMask) {
             if (args & mMask) {
                 char regStr[4] = {};
-                errorCode = createRegStr(regStr, *((int *)(commands + sizeof(char) + sizeof(int))));
-                fprintf(output, "%s [%s+%d]\n", language[com], regStr, *((int *)(commands + sizeof(char))));
+                errorCode = createRegStr(regStr, *((int *)(commands + *ip + sizeof(char) + sizeof(int))));
+                fprintf(output, "%s [%s+%d]\n", language[com], regStr, *((int *)(commands + *ip + sizeof(char))));
 
                 (*commandCount) += 3;
                 (*ip) += sizeof(char) + 2 * sizeof(int);
             }
             else {
                 char regStr[4] = {};
-                errorCode = createRegStr(regStr, *((int *)(commands + sizeof(char) + sizeof(int))));
-                fprintf(output, "%s %s+%d\n", language[com], regStr, *((int *)(commands + sizeof(char))));
+                errorCode = createRegStr(regStr, *((int *)(commands + *ip + sizeof(char) + sizeof(int))));
+                fprintf(output, "%s %s+%d\n", language[com], regStr, *((int *)(commands + *ip + sizeof(char))));
 
                 (*commandCount) += 3;
                 (*ip) += sizeof(char) + 2 * sizeof(int);
             }
         } else if (args & mMask) {
-            fprintf(output, "%s [%d]\n", language[com], *((int *)(commands + sizeof(char))));
+            printf("%d ", *((int *)(commands +  *ip + sizeof(char))));
+            fprintf(output, "%s [%d]\n", language[com], *((int *)(commands + *ip + sizeof(char))));
 
             (*commandCount) += 2;
             (*ip) += sizeof(char) + sizeof(int);
         } else {
-            fprintf(output, "%s %d\n", language[com], *((int *)(commands + sizeof(char))));
+            fprintf(output, "%s %d\n", language[com], *((int *)(commands + *ip + sizeof(char))));
 
             (*commandCount) += 2;
             (*ip) += sizeof(char) + sizeof(int);
@@ -192,23 +211,19 @@ int printCommand(FILE *output, char maskArgs, char popArgs, char *commands, int 
     } else if (args & rMask) {
         if (args & mMask) {
             char regStr[4] = {};
-            errorCode = createRegStr(regStr, *((int *)(commands + sizeof(char))));
+            errorCode = createRegStr(regStr, *((int *)(commands + *ip + sizeof(char))));
             fprintf(output, "%s [%s]\n", language[com], regStr);
 
             (*commandCount) += 2;
             (*ip) += sizeof(char) + sizeof(int);
         } else {
             char regStr[4] = {};
-            errorCode = createRegStr(regStr, *((int *)(commands + sizeof(char))));
+            errorCode = createRegStr(regStr, *((int *)(commands + *ip + sizeof(char))));
             fprintf(output, "%s %s\n", language[com], regStr);
 
             (*commandCount) += 2;
             (*ip) += sizeof(char) + sizeof(int);
         }
-    } else {
-        fprintf(output, "%s\n", language[com]);
-        (*commandCount) += 1;
-        (*ip)++;
     }
 
     return NO_ERROR;
