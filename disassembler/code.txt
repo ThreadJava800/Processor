@@ -1,0 +1,11 @@
+19011 1 16
+CALL
+JBE
+HLT
+HLT
+HLT
+PUSH rÂx+16
+HLT
+PUSH [16]
+PUSH rqx
+PUSH [rÂx+16]

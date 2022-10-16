@@ -3,6 +3,7 @@
 int main(int argc, char *argv[]) {
     int errorCode = 0;
 
+
     if (argc == 2) {
         errorCode = parseMachineCode((const char *) argv[1]);
     } 

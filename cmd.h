@@ -90,3 +90,30 @@ DEF_CMD(SQRT, 20, {\
     double val = sqrt(POP);
     stackPush(&cpu->stack, floor(val) / 100, &errorCode);
 }, 0)
+
+// DEF_CMD(DRAW_PIXEL, 21, {
+//     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+//         fprintf(stderr, "Error initializing SDL2: %s\n", SDL_GetError());
+//         return 1;
+//     }
+
+//     window = SDL_CreateWindow(
+//         "Basic circle",
+//         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+//         SCREEN_WIDTH, SCREEN_HEIGHT,
+//         SDL_WINDOW_SHOWN
+//     );
+
+//     if (window == NULL) {
+//         fprintf(stderr, "could not create window: %s\n", SDL_GetError());
+//         return 1;
+//     }
+
+//     screenSurface = SDL_GetWindowSurface(window);
+//     SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0, 0, 0));
+
+//     SDL_Rect rect = {123, 123, 10, 10}; // x, y, width, height
+//     SDL_FillRect(screenSurface, &rect, SDL_MapRGB(screenSurface->format, 255, 255, 255));
+//     SDL_UpdateWindowSurface(window);
+//     SDL_Delay(1000);
+// }, 0)

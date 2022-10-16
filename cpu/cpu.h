@@ -1,16 +1,23 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <math.h>
+#include <SDL2/SDL.h>
 
 #include "../mlibs/onegin/onegin.h"
 #include "../mlibs/stack/stack.h"
 #include "../config.h"
+
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 
 const int VERSION = 1;
 const int SIGNATURE = 74 * 256 + 67;  // CJ
 
 const int REGSIZE = 10;
 const int RAMSIZE = 100;
+
+static SDL_Window* window = NULL;
+static SDL_Surface* screenSurface = NULL;
 
 struct Cpu_t {
     char *commands = nullptr;

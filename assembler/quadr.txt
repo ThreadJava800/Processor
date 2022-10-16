@@ -10,10 +10,10 @@ MUL
 POP rcx
 POP rbx
 POP rax
-CALL 8
+CALL checkA
 HLT
 
-1:
+discr:
 PUSH rcx
 PUSH rax
 PUSH 4
@@ -26,20 +26,20 @@ SUB
 POP rdx
 PUSH 0
 PUSH rdx
-JAE 7
+JAE sqrtDiscr
 HLT
 RET
 
-7:
+sqrtDiscr:
 PUSH rdx
 SQRT
 PUSH 100
 MUL
 POP rdx
-CALL 4
+CALL compareDiscr
 RET
 
-2:
+rootOne:
 PUSH 2
 PUSH rax
 MUL
@@ -52,7 +52,7 @@ DIV
 DUMP
 RET
 
-3:
+rootTwo:
 PUSH 2
 PUSH rax
 MUL
@@ -65,50 +65,48 @@ DIV
 DUMP
 RET
 
-4:
+compareDiscr:
 PUSH 0
 PUSH rdx
-JE 5
+JE solveOneRoot
 PUSH 0
 PUSH rdx
-JA 6
+JA solveTwoRoots
 HLT
 RET
 
-5:
-CALL 2
+solveOneRoot:
+CALL rootOne
 HLT
 RET
 
-6:
-CALL 2
-CALL 3
+solveTwoRoots:
+CALL rootOne
+CALL rootTwo
 HLT
 RET
 
-8:
+checkA:
 PUSH 0
 PUSH rax
-JE 9
-JMP 1
+JE checkB
+JMP discr
 RET
 
-9:
+checkB:
 PUSH 0
 PUSH rbx
-JE 10
-JMP 1
+JE checkC
+JMP discr
 RET
 
-10:
+checkC:
 PUSH 0
 PUSH rcx
-JE 11
-JMP 1
+JE exit
+JMP discr
 RET
 
-11:
+exit:
 HLT
 RET
-
-// рассм случаи линейного и конст = 0!!!
