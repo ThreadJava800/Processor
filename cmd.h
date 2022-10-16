@@ -91,6 +91,10 @@ DEF_CMD(SQRT, 19, {\
     stackPush(&cpu->stack, floor(val) / 100, &errorCode);
 }, 0)
 
+DEF_CMD(PRINF, 20, {\
+    fprintf(stderr, "INFINITE ROOTS");
+}, 0)
+
 // DEF_CMD(DRAW_PIXEL, 21, {
 //     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 //         fprintf(stderr, "Error initializing SDL2: %s\n", SDL_GetError());

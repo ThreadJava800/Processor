@@ -49,7 +49,7 @@ MUL
 PUSH rdx
 ADD
 DIV
-DUMP
+OUT
 RET
 
 rootTwo:
@@ -62,7 +62,7 @@ PUSH rbx
 MUL
 SUB
 DIV
-DUMP
+OUT
 RET
 
 compareDiscr:
@@ -97,14 +97,28 @@ checkB:
 PUSH 0
 PUSH rbx
 JE checkC
-JMP discr
+JMP solveLinear
+RET
+
+solveLinear:
+PUSH rbx
+PUSH rcx
+PUSH -1
+MUL
+DIV
+OUT
+HLT
 RET
 
 checkC:
 PUSH 0
 PUSH rcx
-JE exit
-JMP discr
+JE printInfinite
+JMP exit
+RET
+
+printInfinite:
+PRINF
 RET
 
 exit:
