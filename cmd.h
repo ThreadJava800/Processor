@@ -95,6 +95,20 @@ DEF_CMD(PRINF, 20, {\
     fprintf(stderr, "INFINITE ROOTS\n");
 }, 0)
 
+DEF_CMD(PRNO, 21, {\
+    fprintf(stderr, "NO ROOTS\n");
+}, 0)
+
+DEF_CMD(JMPMND, 22, {\
+    tm *calendar; // календарьььь с удобным временем и датами
+    time_t timestamp = time(NULL);
+
+    calendar = localtime(&timestamp);
+    if (calendar->tm_wday == 1) {
+        jmp(cpu);
+    }
+}, 2)
+
 // DEF_CMD(DRAW_PIXEL, 21, {
 //     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 //         fprintf(stderr, "Error initializing SDL2: %s\n", SDL_GetError());

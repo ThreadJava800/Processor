@@ -90,14 +90,14 @@ checkA:
 PUSH 0
 PUSH rax
 JE checkB
-JMP discr
+JMPMND discr
 RET
 
 checkB:
 PUSH 0
 PUSH rbx
 JE checkC
-JMP solveLinear
+JMPMND solveLinear
 RET
 
 solveLinear:
@@ -122,5 +122,6 @@ PRINF
 RET
 
 exit:
+PRNO
 HLT
 RET
