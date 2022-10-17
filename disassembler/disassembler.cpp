@@ -83,23 +83,23 @@ int poisonLabels(int *labels, int labelSize) {
 #define DEF_CMD(name, num, code, args)                                          \
     {                                                                            \
     case CMD_##name:                                                              \
-        if (args == 2) {\
-            addLabel(labels, *((int *)(commands + comIp + sizeof(char))));\
-            comIp += sizeof(int);\
-            comNumber++;\
-        }   \
-        else if (args == 1) {\
-            int commandArgs = commands[comIp] & 0xE0; \
-            if ((commandArgs & iMask) && (commandArgs & rMask)) {\
-                comIp += 2 * sizeof(int);\
-                comNumber += 2;\
-            } else {\
-                comIp += sizeof(int);\
-                comNumber++;\
-            }\
-        }    \
-        break;                                                                      \
-    }                                                                                \
+        if (args == 2) {                                                           \
+            addLabel(labels, *((int *)(commands + comIp + sizeof(char))));          \
+            comIp += sizeof(int);                                                    \
+            comNumber++;                                                              \
+        }                                                                              \
+        else if (args == 1) {                                                           \
+            int commandArgs = commands[comIp] & 0xE0;                                    \
+            if ((commandArgs & iMask) && (commandArgs & rMask)) {                         \
+                comIp += 2 * sizeof(int);                                                  \
+                comNumber += 2;                                                             \
+            } else {                                                                         \
+                comIp += sizeof(int);                                                         \
+                comNumber++;                                                                   \
+            }                                                                                   \
+        }                                                                                        \
+        break;                                                                                    \
+    }                                                                                              \
 
 
 int readLabels(char *commands, int comSize, int *labels) {

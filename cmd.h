@@ -92,7 +92,7 @@ DEF_CMD(SQRT, 19, {\
 }, 0)
 
 DEF_CMD(PRINF, 20, {\
-    fprintf(stderr, "INFINITE ROOTS");
+    fprintf(stderr, "INFINITE ROOTS\n");
 }, 0)
 
 // DEF_CMD(DRAW_PIXEL, 21, {

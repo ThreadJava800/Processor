@@ -6,11 +6,27 @@ POP rbx
 POP rdx
 PUSH 2
 IN
+POP rcx
+PUSH rcx
+PUSH 2
+JE caseNonCount
+PUSH rcx
+PUSH 1
+JE caseNonCount
+PUSH 2
+PUSH rcx
+DUMP
 SUB
 POP rcx
 CALL countFibbonachi
 CALL printValues
 HLT
+
+caseNonCount:
+PUSH rax
+OUT
+HLT
+RET
 
 
 printValues:

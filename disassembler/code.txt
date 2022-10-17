@@ -1,112 +1,54 @@
+PUSH 0
+PUSH 1
+PUSH 1
+POP rax
+POP rbx
+POP rdx
+PUSH 2
 IN
-PUSH 100
-MUL
-IN
-PUSH 100
-MUL
-IN
-PUSH 100
-MUL
 POP rcx
+PUSH rcx
+PUSH 2
+JE label_100
+PUSH rcx
+PUSH 1
+JE label_100
+PUSH 2
+PUSH rcx
+DUMP
+SUB
+POP rcx
+CALL label_112
+CALL label_108
+HLT
+
+label_100:
+PUSH rax
+OUT
+HLT
+RET
+
+label_108:
+DUMP
+OUT
+HLT
+RET
+
+label_112:
+PUSH rbx
+PUSH rax
 POP rbx
 POP rax
-CALL label_230
-HLT
-
-label_43:
-PUSH rcx
 PUSH rax
-PUSH 4
-MUL
-MUL
 PUSH rbx
-PUSH rbx
-MUL
-SUB
-POP rdx
-PUSH 0
-PUSH rdx
-JAE label_94
-HLT
-RET
-
-label_94:
-PUSH rdx
-SQRT
-PUSH 100
-MUL
-POP rdx
-CALL label_179
-RET
-
-label_117:
-PUSH 2
-PUSH rax
-MUL
-PUSH -1
-PUSH rbx
-MUL
+ADD
+POP rbx
+PUSH 1
 PUSH rdx
 ADD
-DIV
-DUMP
-RET
-
-label_148:
-PUSH 2
-PUSH rax
-MUL
+POP rdx
 PUSH rdx
-PUSH -1
-PUSH rbx
-MUL
-SUB
-DIV
-DUMP
-RET
-
-label_179:
-PUSH 0
-PUSH rdx
-JE label_211
-PUSH 0
-PUSH rdx
-JA label_218
-HLT
-RET
-
-label_211:
-CALL label_117
-HLT
-RET
-
-label_218:
-CALL label_117
-CALL label_148
-HLT
-RET
-
-label_230:
-PUSH 0
-PUSH rax
-JE label_251
-JMP label_43
-RET
-
-label_251:
-PUSH 0
-PUSH rbx
-JE label_272
-JMP label_43
-RET
-
-label_272:
-PUSH 0
 PUSH rcx
-JE label_293
-JMP label_43
-RET
-
-label_293:
-HLT
+JA label_112
+PUSH rbx
 RET
