@@ -15,7 +15,7 @@ const int VERSION = 1;
 const int SIGNATURE = 74 * 256 + 67;  // CJ
 
 const int REGSIZE = 10;
-const int RAMSIZE = 600 * 600;
+const int RAMSIZE = 200 * 200;
 
 struct Cpu_t {
     char *commands = nullptr;

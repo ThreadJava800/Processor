@@ -115,8 +115,8 @@ DEF_CMD(DRAW_PIXEL, 23, {
     (
         "Basic circle", SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        600,
-        600,
+        206,
+        206,
         SDL_WINDOW_SHOWN
     );
 
@@ -128,8 +128,8 @@ DEF_CMD(DRAW_PIXEL, 23, {
     SDL_RenderClear( renderer );
 
     SDL_Rect r;
-    r.x = 600;
-    r.y = 600;
+    r.x = 100;
+    r.y = 100;
     r.w = 6;
     r.h = 6;
 
@@ -139,8 +139,8 @@ DEF_CMD(DRAW_PIXEL, 23, {
     for (int i = 0; i < RAMSIZE; i++) {
         if (cpu->ram[i] != 0) {
 
-            r.x = (i % 600);
-            r.y = i / 600;
+            r.x = (i % 200);
+            r.y = i / 200;
 
             SDL_SetRenderDrawColor( renderer, 0, 255, 0, 0 );
             SDL_RenderFillRect( renderer, &r );
@@ -149,7 +149,15 @@ DEF_CMD(DRAW_PIXEL, 23, {
 
     SDL_RenderPresent(renderer);
 
-    SDL_Delay( 5000 );
+    int run = 1;
+    SDL_Event e;
+    while (run) {
+        while(SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                run = 0;
+            }
+        }
+    }
 
     SDL_DestroyWindow(window);
     SDL_Quit();

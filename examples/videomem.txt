@@ -6,22 +6,22 @@ JMP main
 
 main:
 PUSH rax
-PUSH 300
+PUSH 100
 SUB
 PUSH rax
-PUSH 300
+PUSH 100
 SUB
 MUL
 PUSH rbx
-PUSH 300
+PUSH 100
 SUB
 PUSH rbx
-PUSH 300
+PUSH 100
 SUB
 MUL
 ADD
-PUSH 300
-PUSH 300
+PUSH 100
+PUSH 100
 MUL
 JAE make1
 JMP make0
@@ -30,13 +30,13 @@ RET
 make1:
 PUSH 1
 PUSH rax
-PUSH 600
+PUSH 200
 PUSH rbx
 MUL
 ADD
 POP rcx
 POP [rcx]
-PUSH 600
+PUSH 200
 PUSH rax
 JAE checkY
 PUSH rax
@@ -49,13 +49,13 @@ RET
 make0:
 PUSH 0
 PUSH rax
-PUSH 600
+PUSH 200
 PUSH rbx
 MUL
 ADD
 POP rcx
 POP [rcx]
-PUSH 600
+PUSH 200
 PUSH rax
 JAE checkY
 PUSH rax
@@ -66,7 +66,7 @@ JMP main
 RET
 
 checkY:
-PUSH 599
+PUSH 199
 PUSH rbx
 JAE cancel
 PUSH 0
@@ -79,5 +79,13 @@ JMP main
 RET
 
 cancel:
+PUSH 100
+PUSH 200
+PUSH 200
+MUL
+ADD
+POP rcx
+PUSH 1
+POP [rcx] 
 DRAW_PIXEL
 HLT
