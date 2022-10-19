@@ -3,7 +3,6 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 
-#include <SDL2/SDL.h>
 #include "../mlibs/onegin/onegin.h"
 #include "../mlibs/stack/stack.h"
 #include "../config.h"
