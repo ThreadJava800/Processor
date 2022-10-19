@@ -119,6 +119,6 @@ _deps
 log.txt
 
 mlibs/
-cpu/SFML-2.5.1
+cpu/SFML-2.5.1/
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,c++,c,cmake
