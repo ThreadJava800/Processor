@@ -24,7 +24,7 @@ int parseMachineCode(const char *input, const char *output) {
 #define DEF_CMD(name, num, code, args)                                                  \
     {                                                                                    \
     case CMD_##name:                                                                      \
-        printCommand(output, commands[ip], args, commands, &ip, &commandCount, labels);    \ 
+        printCommand(output, commands[ip], args, commands, &ip, &commandCount, labels);    \
         break;                                                                              \
     }                                                                                        \
 

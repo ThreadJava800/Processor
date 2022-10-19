@@ -49,7 +49,7 @@ int execute(const char *fileName, const char *outputName) {
     return error;
 }
 
-#define DEF_CMD(name, num, code, args)                                           \                                                                                                                                       
+#define DEF_CMD(name, num, code, args)                                           \
     if (!strcasecmp(command, #name)) {                                            \
         if (args == 1) {                                                           \
                                                                                     \
@@ -59,14 +59,14 @@ int execute(const char *fileName, const char *outputName) {
                                                                                         \
             parseJumpCall(assembler, i, num, &needSecondCompile, labels, labelCount);    \
                                                                                           \
-        } else {                                                                           \   
+        } else {                                                                           \
             *assembler->machineCommands = num;                                              \
-            assembler->machineCommands++;                                                    \
-            assembler->commandBytes++;                                                        \
+             assembler->machineCommands++;                                                   \
+             assembler->commandBytes++;                                                       \
                                                                                                \
-            assembler->commandCount++;                                                          \
+             assembler->commandCount++;                                                         \
         }                                                                                        \
-                                                                                                  \                                                                               
+                                                                                                  \
     } else                                                                                                                                                                                                                                                                                                                                                                                                                              
 
 int compile(Assembler_t *assembler, Label_t *labels, int *labelCount, int compileCount){ 
@@ -132,9 +132,9 @@ int generateMachineFile(Assembler_t *assembler, const char *fileName) {
     }
 
     fwrite(&SIGNATURE, sizeof(SIGNATURE), 1, output);
-    fwrite(&VERSION, sizeof(VERSION), 1, output);
-    fwrite(&assembler->commandCount, sizeof(assembler->commandCount), 1, output);
-    fwrite(assembler->machineCommands, sizeof(assembler->machineCommands[0]), assembler->commandBytes, output);
+    fwrite(&VERSION,   sizeof(VERSION),   1, output);
+    fwrite(&assembler->commandCount,      sizeof(assembler->commandCount),       1,                       output);
+    fwrite( assembler->machineCommands,   sizeof(assembler->machineCommands[0]), assembler->commandBytes, output);
 
     fclose(output);
 
@@ -183,8 +183,8 @@ int parsePushPop(Assembler_t *assembler, int ip, char commandId) {
     }
 
     *assembler->machineCommands = commandId;
-    assembler->machineCommands++;
-    assembler->commandBytes++;
+     assembler->machineCommands++;
+     assembler->commandBytes++;
 
     if (count == 2) {
         arg2 = reg;
@@ -195,7 +195,7 @@ int parsePushPop(Assembler_t *assembler, int ip, char commandId) {
 
     memcpy(assembler->machineCommands, &arg1, sizeof(int));
     assembler->machineCommands += sizeof(int);
-    assembler->commandBytes += sizeof(int);
+    assembler->commandBytes    += sizeof(int);
 
     assembler->commandCount += 2;
 

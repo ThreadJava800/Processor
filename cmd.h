@@ -58,48 +58,48 @@ DEF_CMD(CALL, 11, {
     errorCode = jmp(cpu);
 }, 2)
 
-DEF_CMD(RET, 12, {\
+DEF_CMD(RET, 12, {
     cpu->ip = stackPop(&cpu->callStack, &errorCode) - 1;
 }, 0)
 
-DEF_CMD(JB, 13, {\
+DEF_CMD(JB, 13, {
     JUMP_HELPER(<)
 }, 2)
 
-DEF_CMD(JA, 14, {\
+DEF_CMD(JA, 14, {
     JUMP_HELPER(>)
 }, 2)
 
-DEF_CMD(JAE, 15, {\
+DEF_CMD(JAE, 15, {
     JUMP_HELPER(>=)
 }, 2)
 
-DEF_CMD(JBE, 16, {\
+DEF_CMD(JBE, 16, {
     JUMP_HELPER(<=)
 }, 2)
 
-DEF_CMD(JE, 17, {\
+DEF_CMD(JE, 17, {
     JUMP_HELPER(==)
 }, 2)
 
-DEF_CMD(JNE, 18, {\
+DEF_CMD(JNE, 18, {
     JUMP_HELPER(!=)
 }, 2)
 
-DEF_CMD(SQRT, 19, {\
+DEF_CMD(SQRT, 19, {
     double val = sqrt(POP);
     stackPush(&cpu->stack, floor(val) / 100, &errorCode);
 }, 0)
 
-DEF_CMD(PRINF, 20, {\
+DEF_CMD(PRINF, 20, {
     fprintf(stderr, "INFINITE ROOTS\n");
 }, 0)
 
-DEF_CMD(PRNO, 21, {\
+DEF_CMD(PRNO, 21, {
     fprintf(stderr, "NO ROOTS\n");
 }, 0)
 
-DEF_CMD(JMPMND, 22, {\
+DEF_CMD(JMPMND, 22, {
     tm *calendar; // календарьььь с удобным временем и датами
     time_t timestamp = time(NULL);
 
@@ -109,29 +109,48 @@ DEF_CMD(JMPMND, 22, {\
     }
 }, 2)
 
-// DEF_CMD(DRAW_PIXEL, 21, {
-//     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-//         fprintf(stderr, "Error initializing SDL2: %s\n", SDL_GetError());
-//         return 1;
-//     }
+DEF_CMD(DRAW_PIXEL, 23, {
+    SDL_Window* window = NULL;
+    window = SDL_CreateWindow
+    (
+        "Basic circle", SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        600,
+        600,
+        SDL_WINDOW_SHOWN
+    );
 
-//     window = SDL_CreateWindow(
-//         "Basic circle",
-//         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-//         SCREEN_WIDTH, SCREEN_HEIGHT,
-//         SDL_WINDOW_SHOWN
-//     );
+    SDL_Renderer* renderer = NULL;
+    renderer =  SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
 
-//     if (window == NULL) {
-//         fprintf(stderr, "could not create window: %s\n", SDL_GetError());
-//         return 1;
-//     }
+    SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0 );
 
-//     screenSurface = SDL_GetWindowSurface(window);
-//     SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0, 0, 0));
+    SDL_RenderClear( renderer );
 
-//     SDL_Rect rect = {123, 123, 10, 10}; // x, y, width, height
-//     SDL_FillRect(screenSurface, &rect, SDL_MapRGB(screenSurface->format, 255, 255, 255));
-//     SDL_UpdateWindowSurface(window);
-//     SDL_Delay(1000);
-// }, 0)
+    SDL_Rect r;
+    r.x = 600;
+    r.y = 600;
+    r.w = 6;
+    r.h = 6;
+
+    SDL_SetRenderDrawColor( renderer, 0, 255, 0, 0 );
+    SDL_RenderFillRect( renderer, &r );
+
+    for (int i = 0; i < RAMSIZE; i++) {
+        if (cpu->ram[i] != 0) {
+
+            r.x = (i % 600);
+            r.y = i / 600;
+
+            SDL_SetRenderDrawColor( renderer, 0, 255, 0, 0 );
+            SDL_RenderFillRect( renderer, &r );
+        }
+    }
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Delay( 5000 );
+
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}, 0)

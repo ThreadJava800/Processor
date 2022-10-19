@@ -59,7 +59,7 @@ int execute(char *fileName) {
 #define DEF_CMD(name, num, code, args)    \
     {                                      \
     case CMD_##name:                        \
-            code                             \ 
+            code                             \
             break;                            \
     }                                          \
 

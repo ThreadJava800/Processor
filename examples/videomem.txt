@@ -1,0 +1,83 @@
+PUSH 0
+PUSH 0
+POP rax
+POP rbx
+JMP main
+
+main:
+PUSH rax
+PUSH 300
+SUB
+PUSH rax
+PUSH 300
+SUB
+MUL
+PUSH rbx
+PUSH 300
+SUB
+PUSH rbx
+PUSH 300
+SUB
+MUL
+ADD
+PUSH 300
+PUSH 300
+MUL
+JAE make1
+JMP make0
+RET
+
+make1:
+PUSH 1
+PUSH rax
+PUSH 600
+PUSH rbx
+MUL
+ADD
+POP rcx
+POP [rcx]
+PUSH 600
+PUSH rax
+JAE checkY
+PUSH rax
+PUSH 1
+ADD
+POP rax
+JMP main
+RET
+
+make0:
+PUSH 0
+PUSH rax
+PUSH 600
+PUSH rbx
+MUL
+ADD
+POP rcx
+POP [rcx]
+PUSH 600
+PUSH rax
+JAE checkY
+PUSH rax
+PUSH 1
+ADD
+POP rax
+JMP main
+RET
+
+checkY:
+PUSH 599
+PUSH rbx
+JAE cancel
+PUSH 0
+POP rax
+PUSH rbx
+PUSH 1
+ADD
+POP rbx
+JMP main
+RET
+
+cancel:
+DRAW_PIXEL
+HLT

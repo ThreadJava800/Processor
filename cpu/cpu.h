@@ -3,6 +3,7 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 
+#include <SDL2/SDL.h>
 #include "../mlibs/onegin/onegin.h"
 #include "../mlibs/stack/stack.h"
 #include "../config.h"
@@ -14,10 +15,7 @@ const int VERSION = 1;
 const int SIGNATURE = 74 * 256 + 67;  // CJ
 
 const int REGSIZE = 10;
-const int RAMSIZE = 100;
-
-static SDL_Window* window = NULL;
-static SDL_Surface* screenSurface = NULL;
+const int RAMSIZE = 600 * 600;
 
 struct Cpu_t {
     char *commands = nullptr;

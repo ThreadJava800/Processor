@@ -1,4 +1,3 @@
-PRDATE
 PUSH 0
 PUSH 1
 PUSH 1
@@ -16,7 +15,6 @@ PUSH 1
 JE caseNonCount
 PUSH 2
 PUSH rcx
-DUMP
 SUB
 POP rcx
 CALL countFibbonachi
@@ -31,7 +29,6 @@ RET
 
 
 printValues:
-DUMP
 OUT
 HLT
 ret
